@@ -46,7 +46,6 @@
         .nav-menu { flex: 1; padding: 20px 0; }
         .nav-link { display: block; padding: 15px 25px; color: var(--text-light); text-decoration: none; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .nav-link.active { background-color: rgba(255,255,255,0.05); color: var(--white); border-left-color: var(--primary); }
-        .nav-link:hover { color: white; background: rgba(255,255,255,0.02); }
 
         .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
         .topbar { background-color: var(--white); min-height: 70px; display: flex; align-items: center; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -58,7 +57,6 @@
         .form-group label { font-size: 14px; color: var(--text-dark); font-weight: 600; margin-bottom: 10px; }
         
         input, select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: var(--main-bg); outline: none; transition: 0.3s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--secondary); background: white; }
         textarea { min-height: 150px; resize: vertical; }
 
         .dynamic-block { background-color: #f8f9fa; border: 1px solid var(--border); padding: 25px; border-radius: 10px; margin-bottom: 20px; position: relative; border-left: 4px solid var(--secondary); }
@@ -66,9 +64,7 @@
 
         .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .btn-add { background-color: #f1f2f6; color: var(--secondary); border: 1px dashed var(--secondary); width: 100%; margin-bottom: 25px; }
-        .btn-add:hover { background: var(--secondary); color: white; }
         .btn-submit { background-color: var(--success); color: white; width: 100%; font-size: 17px; }
-        .btn-submit:hover { background: #219150; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); }
     </style>
 </head>
 <body>
@@ -76,9 +72,9 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>Admin Girişi</h2>
-            <input type="text" id="adminUser" placeholder="Kullanıcı Adı" autocomplete="off">
+            <input type="text" id="adminUser" placeholder="Kullanıcı Adı">
             <input type="password" id="adminPass" placeholder="Şifre">
-            <button onclick="panelGiris()">Sisteme Gir</button>
+            <button onclick="window.panelGiris()">Sisteme Gir</button>
         </div>
     </div>
 
@@ -103,15 +99,15 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Şehir / Bölge Seçimi</label>
-                            <select id="anaKategori" onchange="altKategoriDoldur()" required>
+                            <select id="anaKategori" onchange="window.altKategoriDoldur()" required>
                                 <option value="">Seçiniz...</option>
-                                <option value="Edirne">Edirne</option>
-                                <option value="Tekirdağ">Tekirdağ</option>
-                                <option value="Kırklareli">Kırklareli</option>
-                                <option value="Çanakkale">Çanakkale</option>
-                                <option value="Sakin_Sehirler">Sakin Şehirler</option>
-                                <option value="Turk_Mutfagi">Türk Mutfağı</option>
-                                <option value="Dunya_Mutfagi">Dünya Mutfağı</option>
+                                <option value="Edirne">A) Edirne</option>
+                                <option value="Tekirdağ">B) Tekirdağ</option>
+                                <option value="Kırklareli">C) Kırklareli</option>
+                                <option value="Çanakkale">D) Çanakkale</option>
+                                <option value="Sakin_Sehirler">E) Sakin Şehirler</option>
+                                <option value="Turk_Mutfagi">F) Türk Mutfağı</option>
+                                <option value="Dunya_Mutfagi">G) Dünya Mutfağı</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -123,13 +119,13 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Başlık (Örn: Meşhur Köfteci Ali)</label>
+                        <label>Başlık</label>
                         <input type="text" id="baslik" placeholder="Başlık giriniz..." required>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label>Fotoğraf Linki (URL)</label>
-                        <input type="url" id="gorselUrl" placeholder="https://resimlinki.com/gorsel.jpg">
+                        <input type="url" id="gorselUrl" placeholder="https://...">
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -139,13 +135,13 @@
 
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label>Google Maps / Kaynak URL</label>
-                        <input type="url" id="mekanLinki" placeholder="https://maps.google.com/...">
+                        <input type="url" id="mekanLinki" placeholder="https://...">
                     </div>
 
                     <div id="dinamikAlanlar"></div>
 
-                    <button type="button" class="btn btn-add" onclick="yeniYaziAlaniEkle()">+ Yeni Paragraf / Alt Bölüm Ekle</button>
-                    <button type="button" class="btn btn-submit" onclick="veritabaninaKaydet()">💾 İçeriği Firebase'e Gönder</button>
+                    <button type="button" class="btn btn-add" onclick="window.yeniYaziAlaniEkle()">+ Yeni Paragraf / Alt Bölüm Ekle</button>
+                    <button type="button" class="btn btn-submit" onclick="window.veritabaninaKaydet()">💾 Firebase'e Kaydet</button>
                 </form>
             </section>
         </main>
@@ -167,7 +163,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- GİRİŞ KONTROLÜ ---
+        // --- GLOBAL YAPMA ---
         window.panelGiris = function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
@@ -175,11 +171,10 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'flex';
             } else {
-                alert("Kullanıcı adı veya şifre hatalı!");
+                alert("Hatalı Giriş!");
             }
         };
 
-        // --- KATEGORİ LİSTESİ ---
         const kategoriler = {
             "Edirne": ["Edirne Hakkında", "Coğrafi İşaretli Ürünler", "Edirne Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
             "Tekirdağ": ["Tekirdağ Hakkında", "Coğrafi İşaretli Ürünler", "Tekirdağ Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
@@ -194,14 +189,16 @@
             const ana = document.getElementById("anaKategori").value;
             const alt = document.getElementById("altKategori");
             alt.innerHTML = '<option value="">Seçiniz...</option>';
-            if(kategoriler[ana]) {
-                kategoriler[ana].forEach(i => {
+            // Select ID'leri ve nesne isimlerini eşleştirmek için "A) Edirne" gibi kısımları temizliyoruz
+            const temizAna = ana.split(') ')[1] || ana; 
+            
+            if(kategoriler[temizAna]) {
+                kategoriler[temizAna].forEach(i => {
                     let o = document.createElement("option"); o.value = i; o.innerText = i; alt.appendChild(o);
                 });
             }
         };
 
-        // --- DİNAMİK ALAN EKLEME ---
         let blokID = 0;
         window.yeniYaziAlaniEkle = function() {
             blokID++;
@@ -211,23 +208,16 @@
             div.id = `block_${blokID}`;
             div.innerHTML = `
                 <button type="button" class="remove-block-btn" onclick="document.getElementById('block_${blokID}').remove()">✖ Kaldır</button>
-                <div style="margin-bottom:10px">
-                    <label style="font-size:13px; font-weight:600">Alt Bölüm Başlığı (Örn: Malzemeler)</label>
-                    <input type="text" class="d-baslik">
-                </div>
-                <div>
-                    <label style="font-size:13px; font-weight:600">Bölüm İçeriği</label>
-                    <textarea class="d-metin" style="min-height:80px"></textarea>
-                </div>
+                <input type="text" class="d-baslik" placeholder="Alt Başlık" style="margin-bottom:10px">
+                <textarea class="d-metin" style="min-height:80px" placeholder="Detaylar..."></textarea>
             `;
             container.appendChild(div);
         };
 
-        // --- KAYDETME ---
         window.veritabaninaKaydet = async function() {
             const ana = document.getElementById("anaKategori").value;
             const baslik = document.getElementById("baslik").value;
-            if(!ana || !baslik) { alert("Şehir ve Başlık alanları boş bırakılamaz!"); return; }
+            if(!ana || !baslik) { alert("Eksik alan var!"); return; }
 
             let ekstralar = [];
             document.querySelectorAll('.dynamic-block').forEach(b => {
@@ -250,13 +240,10 @@
 
             try {
                 await addDoc(collection(db, "icerikler"), veri);
-                alert("✅ İçerik başarıyla yayınlandı!");
+                alert("✅ Başarıyla kaydedildi!");
                 document.getElementById("icerikFormu").reset();
                 document.getElementById("dinamikAlanlar").innerHTML = "";
-            } catch (e) {
-                console.error(e);
-                alert("Bir hata oluştu, veritabanını kontrol et!");
-            }
+            } catch (e) { alert("Hata!"); console.error(e); }
         };
     </script>
 </body>
