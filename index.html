@@ -72,8 +72,8 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>Admin Girişi</h2>
-            <input type="text" id="adminUser" placeholder="Kullanıcı Adı">
-            <input type="password" id="adminPass" placeholder="Şifre">
+            <input type="text" id="adminUser" placeholder="Kullanıcı Adı" autocomplete="off">
+            <input type="password" id="adminPass" placeholder="Şifre" autocomplete="off">
             <button onclick="window.panelGiris()">Sisteme Gir</button>
         </div>
     </div>
@@ -120,12 +120,12 @@
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label>Başlık</label>
-                        <input type="text" id="baslik" placeholder="Başlık giriniz..." required>
+                        <input type="text" id="baslik" placeholder="Başlık giriniz (Örn: Meşhur Köfteci)..." required>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label>Fotoğraf Linki (URL)</label>
-                        <input type="url" id="gorselUrl" placeholder="https://...">
+                        <input type="url" id="gorselUrl" placeholder="https://ornekresim.com/resim.jpg">
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -135,7 +135,7 @@
 
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label>Google Maps / Kaynak URL</label>
-                        <input type="url" id="mekanLinki" placeholder="https://...">
+                        <input type="url" id="mekanLinki" placeholder="https://goo.gl/maps/...">
                     </div>
 
                     <div id="dinamikAlanlar"></div>
@@ -163,7 +163,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- GLOBAL YAPMA ---
+        // --- 1. GİRİŞ KONTROLÜ ---
         window.panelGiris = function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
@@ -171,34 +171,40 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'flex';
             } else {
-                alert("Hatalı Giriş!");
+                alert("Kullanıcı adı veya şifre hatalı!");
             }
         };
 
+        // --- 2. KATEGORİ VERİLERİ ---
+        // Daha önce eksik olan "Et Yemekleri", "Sebze Yemekleri" gibi alt kırılımlar Türk Mutfağı, Dünya Mutfağı ve Sakin Şehirlere eklendi.
         const kategoriler = {
             "Edirne": ["Edirne Hakkında", "Coğrafi İşaretli Ürünler", "Edirne Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
             "Tekirdağ": ["Tekirdağ Hakkında", "Coğrafi İşaretli Ürünler", "Tekirdağ Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
             "Kırklareli": ["Kırklareli Hakkında", "Coğrafi İşaretli Ürünler", "Kırklareli Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
             "Çanakkale": ["Çanakkale Hakkında", "Coğrafi İşaretli Ürünler", "Çanakkale Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Sakin_Sehirler": ["Sakin Şehirler Hakkında", "Sakin Şehirler Lezzet Durakları", "Sakin Şehir Mutfağı"],
-            "Turk_Mutfagi": ["Türk Mutfağı Hakkında", "Coğrafi İşaretli Ürünler", "Lezzet Durakları", "Türk Mutfağından Seçmeler"],
-            "Dunya_Mutfagi": ["Dünya Mutfağından Seçmeler"]
+            "Sakin_Sehirler": ["Sakin Şehirler Hakkında", "Sakin Şehirler Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
+            "Turk_Mutfagi": ["Türk Mutfağı Hakkında", "Coğrafi İşaretli Ürünler", "Lezzet Durakları", "Türk Mutfağından Seçmeler", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
+            "Dunya_Mutfagi": ["Dünya Mutfağından Seçmeler", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
         };
 
+        // --- 3. ALT KATEGORİ DOLDURMA ---
         window.altKategoriDoldur = function() {
-            const ana = document.getElementById("anaKategori").value;
-            const alt = document.getElementById("altKategori");
-            alt.innerHTML = '<option value="">Seçiniz...</option>';
-            // Select ID'leri ve nesne isimlerini eşleştirmek için "A) Edirne" gibi kısımları temizliyoruz
-            const temizAna = ana.split(') ')[1] || ana; 
+            const anaSelect = document.getElementById("anaKategori").value;
+            const altSelect = document.getElementById("altKategori");
+            altSelect.innerHTML = '<option value="">Seçiniz...</option>';
             
-            if(kategoriler[temizAna]) {
-                kategoriler[temizAna].forEach(i => {
-                    let o = document.createElement("option"); o.value = i; o.innerText = i; alt.appendChild(o);
+            // Eğer kategori seçildiyse ilgili diziyi getirip optionları oluştur
+            if(anaSelect && kategoriler[anaSelect]) {
+                kategoriler[anaSelect].forEach(item => {
+                    let opt = document.createElement("option"); 
+                    opt.value = item; 
+                    opt.innerText = item; 
+                    altSelect.appendChild(opt);
                 });
             }
         };
 
+        // --- 4. DİNAMİK ALAN (YENİ PARAGRAF) EKLEME ---
         let blokID = 0;
         window.yeniYaziAlaniEkle = function() {
             blokID++;
@@ -206,19 +212,27 @@
             const div = document.createElement("div");
             div.className = "dynamic-block";
             div.id = `block_${blokID}`;
+            
             div.innerHTML = `
                 <button type="button" class="remove-block-btn" onclick="document.getElementById('block_${blokID}').remove()">✖ Kaldır</button>
-                <input type="text" class="d-baslik" placeholder="Alt Başlık" style="margin-bottom:10px">
-                <textarea class="d-metin" style="min-height:80px" placeholder="Detaylar..."></textarea>
+                <input type="text" class="d-baslik" placeholder="Alt Başlık (Örn: Malzemeler)" style="margin-bottom:10px">
+                <textarea class="d-metin" style="min-height:80px" placeholder="Bölüm içeriği veya detaylar..."></textarea>
             `;
             container.appendChild(div);
         };
 
+        // --- 5. VERİTABANINA KAYDETME ---
         window.veritabaninaKaydet = async function() {
             const ana = document.getElementById("anaKategori").value;
+            const alt = document.getElementById("altKategori").value;
             const baslik = document.getElementById("baslik").value;
-            if(!ana || !baslik) { alert("Eksik alan var!"); return; }
+            
+            if(!ana || !alt || !baslik) { 
+                alert("Hata: Lütfen Şehir, Alt Kategori ve Başlık alanlarını eksiksiz doldurun!"); 
+                return; 
+            }
 
+            // Dinamik alanlardaki verileri toparla
             let ekstralar = [];
             document.querySelectorAll('.dynamic-block').forEach(b => {
                 ekstralar.push({
@@ -227,9 +241,10 @@
                 });
             });
 
-            const veri = {
+            // Firebase'e gönderilecek tam veri paketi
+            const veriPaketi = {
                 kategori: ana,
-                alt_kategori: document.getElementById("altKategori").value,
+                alt_kategori: alt,
                 baslik: baslik,
                 gorsel_url: document.getElementById("gorselUrl").value,
                 ana_metin: document.getElementById("anaMetin").value,
@@ -238,12 +253,17 @@
                 tarih: new Date().toLocaleString('tr-TR')
             };
 
+            // Kaydetme işlemi
             try {
-                await addDoc(collection(db, "icerikler"), veri);
-                alert("✅ Başarıyla kaydedildi!");
+                await addDoc(collection(db, "icerikler"), veriPaketi);
+                alert("✅ İçerik Başarıyla Firebase Veritabanına Kaydedildi!");
+                // Formu sıfırla
                 document.getElementById("icerikFormu").reset();
                 document.getElementById("dinamikAlanlar").innerHTML = "";
-            } catch (e) { alert("Hata!"); console.error(e); }
+            } catch (e) { 
+                alert("Kaydetme sırasında bir hata oluştu! Konsolu kontrol edin."); 
+                console.error(e); 
+            }
         };
     </script>
 </body>
