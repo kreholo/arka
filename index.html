@@ -1,6 +1,88 @@
-<body>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli - Trakya Mutfağı</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    <div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; justify-content: center; align-items: center; flex-direction: column; z-index: 9999;">
+        :root {
+            --sidebar-bg: #1e272e;
+            --main-bg: #f5f6fa;
+            --primary: #c0392b;
+            --secondary: #2980b9;
+            --success: #27ae60;
+            --text-dark: #2f3640;
+            --text-light: #7f8fa6;
+            --white: #ffffff;
+            --border: #dcdde1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--main-bg); overflow: hidden; height: 100vh; }
+
+        /* --- GİRİŞ EKRANI --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #1e272e; display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 15px; width: 380px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .login-box h2 { color: var(--primary); margin-bottom: 25px; font-weight: 700; }
+        .login-box input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; outline: none; background: #f9f9f9; }
+        .login-box button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: 0.3s; }
+        .login-box button:hover { background: #a93226; }
+
+        /* --- YÜKLENİYOR (LOADER) EKRANI --- */
+        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; }
+
+        /* --- PANEL YAPISI --- */
+        #admin-panel { display: none; height: 100vh; width: 100%; }
+        
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); color: var(--white); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { font-size: 22px; color: var(--primary); letter-spacing: 1px; }
+
+        .nav-menu { flex: 1; padding: 20px 0; }
+        .nav-link { display: block; padding: 15px 25px; color: var(--text-light); text-decoration: none; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
+        .nav-link.active { background-color: rgba(255,255,255,0.05); color: var(--white); border-left-color: var(--primary); }
+        .nav-link:hover { color: white; }
+
+        .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .topbar { background-color: var(--white); min-height: 70px; display: flex; align-items: center; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); justify-content: space-between; }
+        
+        .form-container { background-color: var(--white); margin: 30px auto; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.05); width: 90%; max-width: 1000px; }
+        
+        .form-row { display: flex; gap: 20px; margin-bottom: 25px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        .form-group label { font-size: 14px; color: var(--text-dark); font-weight: 600; margin-bottom: 10px; }
+        
+        input, select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: var(--main-bg); outline: none; transition: 0.3s; }
+        textarea { min-height: 150px; resize: vertical; }
+
+        .dynamic-block { background-color: #f8f9fa; border: 1px solid var(--border); padding: 25px; border-radius: 10px; margin-bottom: 20px; position: relative; border-left: 4px solid var(--secondary); }
+        .remove-block-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 5px; font-size: 12px; }
+
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-add { background-color: #f1f2f6; color: var(--secondary); border: 1px dashed var(--secondary); width: 100%; margin-bottom: 25px; }
+        .btn-submit { background-color: var(--success); color: white; width: 100%; font-size: 17px; }
+
+        /* --- LİSTE TASARIMI --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--main-bg); color: var(--text-dark); }
+        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 5px; cursor: pointer; border: none; color: white; }
+        .btn-edit { background-color: var(--secondary); margin-right: 5px; }
+        .btn-delete { background-color: var(--primary); }
+        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border); }
+    </style>
+</head>
+    <body>
+
+    <div id="loader">
         <h3 id="loader-text">Kaydediliyor...</h3>
     </div>
 
@@ -117,8 +199,7 @@
 
         </main>
     </div>
-
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -160,6 +241,7 @@
         };
 
         window.altKategoriDoldur = function() {
+            // "A) Edirne" gibi formatları sadece "Edirne" yapıyoruz
             const ana = document.getElementById("anaKategori").value.split(') ')[1] || document.getElementById("anaKategori").value;
             const alt = document.getElementById("altKategori");
             alt.innerHTML = '<option value="">Seçiniz...</option>';
@@ -206,8 +288,8 @@
             div.style.gap = "10px";
             div.style.marginBottom = "10px";
             div.innerHTML = `
-                <input type="url" class="foto-link-input" placeholder="https://..." value="${mevcutLink}" style="flex: 1;">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:8px; padding:0 15px; cursor:pointer;">✖ Sil</button>
+                <input type="url" class="foto-link-input" placeholder="https://..." value="${mevcutLink}" style="flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px;">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:8px; padding:0 15px; cursor:pointer; font-size:12px;">✖ Sil</button>
             `;
             alan.appendChild(div);
         };
@@ -229,7 +311,10 @@
 
         // --- KAYDET VEYA GÜNCELLE ---
         window.veritabaninaKaydet = async function() {
-            const ana = document.getElementById("anaKategori").value;
+            // "A) Edirne" olan veriyi "Edirne" olarak veritabanına kaydet
+            const hamAna = document.getElementById("anaKategori").value;
+            const ana = hamAna.split(') ')[1] || hamAna;
+            
             const alt = document.getElementById("altKategori").value;
             const baslik = document.getElementById("baslik").value;
             const editID = document.getElementById("editID").value;
@@ -258,11 +343,11 @@
 
                 // 3. Veri Paketi
                 const veriPaketi = {
-                    kategori: ana,
+                    kategori: ana, // Düzeltilmiş isim gider (Örn: Edirne)
                     alt_kategori: alt,
                     baslik: baslik,
                     gorseller: resimListesi, // Çoklu Link Dizisi
-                    gorsel_url: resimListesi.length > 0 ? resimListesi[0] : "", // Geriye dönük uyumluluk için ilk resmi buraya da yazıyoruz
+                    gorsel_url: resimListesi.length > 0 ? resimListesi[0] : "", // Geriye dönük uyumluluk
                     ana_metin: document.getElementById("anaMetin").value,
                     link: document.getElementById("mekanLinki").value,
                     link_isim: document.getElementById("linkIsmi").value || "Tıkla ve Git",
@@ -348,7 +433,15 @@
             
             document.getElementById("editID").value = veri.id;
             
-            document.getElementById("anaKategori").value = veri.kategori;
+            // Kategori Eşleştirme ("Edirne" olan veriyi "A) Edirne" option'ına oturtmak için)
+            const selectOptions = document.getElementById("anaKategori").options;
+            for(let i=0; i<selectOptions.length; i++) {
+                if(selectOptions[i].value.includes(veri.kategori)) {
+                    document.getElementById("anaKategori").value = selectOptions[i].value;
+                    break;
+                }
+            }
+            
             window.altKategoriDoldur(); 
             setTimeout(() => { document.getElementById("altKategori").value = veri.alt_kategori; }, 100);
 
@@ -361,10 +454,10 @@
             document.getElementById("foto-linkleri-alani").innerHTML = "";
             if(veri.gorseller && veri.gorseller.length > 0) {
                 veri.gorseller.forEach(url => window.yeniFotoLinkiEkle(url));
-            } else if (veri.gorsel_url) { // Eski kayıtlar için destek
+            } else if (veri.gorsel_url) { 
                 window.yeniFotoLinkiEkle(veri.gorsel_url);
             } else {
-                window.yeniFotoLinkiEkle(); // Boşsa 1 tane boş aç
+                window.yeniFotoLinkiEkle(); 
             }
 
             // Dinamik alanları doldur
@@ -380,3 +473,4 @@
         };
     </script>
 </body>
+</html>
