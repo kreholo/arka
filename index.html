@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -60,11 +61,19 @@
         .form-group { flex: 1; display: flex; flex-direction: column; }
         .form-group label { font-size: 14px; color: var(--text-dark); font-weight: 600; margin-bottom: 10px; }
         
-        input, select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: var(--main-bg); outline: none; transition: 0.3s; }
+        input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: var(--main-bg); outline: none; transition: 0.3s; }
         textarea { min-height: 150px; resize: vertical; }
 
         .dynamic-block { background-color: #f8f9fa; border: 1px solid var(--border); padding: 25px; border-radius: 10px; margin-bottom: 20px; position: relative; border-left: 4px solid var(--secondary); }
         .remove-block-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 5px; font-size: 12px; }
+
+        /* --- FOTOĞRAF VE BUTON ALANLARI YENİ CSS --- */
+        .foto-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .foto-layout-select { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; background: #f9f9f9; }
+        
+        .btn-ekle-blok { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: #e8f4f8; padding: 15px; border-radius: 8px; border: 1px solid #bfe0eb; position: relative; flex-wrap: wrap;}
+        .btn-input { flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; }
+        .btn-color { width: 45px; height: 40px; padding: 0; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: white; }
 
         .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .btn-add { background-color: #f1f2f6; color: var(--secondary); border: 1px dashed var(--secondary); width: 100%; margin-bottom: 25px; }
@@ -77,13 +86,12 @@
         .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 5px; cursor: pointer; border: none; color: white; }
         .btn-edit { background-color: var(--secondary); margin-right: 5px; }
         .btn-delete { background-color: var(--primary); }
-        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border); }
     </style>
 </head>
-    <body>
+<body>
 
     <div id="loader">
-        <h3 id="loader-text">Kaydediliyor...</h3>
+        <h3 id="loader-text">İşlem Yapılıyor, Lütfen Bekleyin...</h3>
     </div>
 
     <div id="login-screen">
@@ -144,14 +152,14 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px; background: #fdf2e9; padding: 20px; border-radius: 8px; border: 1px dashed var(--primary);">
-                        <label style="color: var(--primary);">Fotoğraf Linkleri (URL)</label>
-                        <p style="font-size: 12px; color: #555; margin-bottom: 10px;">İnternetteki bir fotoğrafın adresini (URL) kopyalayıp buraya yapıştırın. Birden fazla fotoğraf eklemek için butona tıklayın.</p>
+                        <label style="color: var(--primary); font-size: 16px;">Fotoğraflar ve Görünüm Düzeni</label>
+                        <p style="font-size: 12px; color: #555; margin-bottom: 10px;">Fotoğraf URL'sini yapıştırın ve sayfada nerede duracağını seçin.</p>
                         
                         <div id="foto-linkleri-alani">
                             </div>
                         
                         <button type="button" class="btn btn-add" style="margin-bottom: 0; margin-top: 10px; width: auto; padding: 8px 15px; font-size: 13px;" onclick="window.yeniFotoLinkiEkle()">
-                            + Yeni Fotoğraf Linki Ekle
+                            + Yeni Fotoğraf Ekle
                         </button>
                     </div>
 
@@ -160,21 +168,27 @@
                         <textarea id="anaMetin" placeholder="Genel bilgileri buraya yazın..."></textarea>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Yönlendirme Linki (Harita/Web Sitesi vb.)</label>
-                            <input type="url" id="mekanLinki" placeholder="https://goo.gl/maps/...">
-                        </div>
-                        <div class="form-group">
-                            <label>Butonda Ne Yazsın?</label>
-                            <input type="text" id="linkIsmi" placeholder="Örn: Haritada Göster, Sipariş Ver..." value="Tıkla ve Git">
-                        </div>
+                    <div class="form-group" style="margin-bottom: 25px; background: #f0f7fa; padding: 20px; border-radius: 8px; border: 1px dashed var(--secondary);">
+                        <label style="color: var(--secondary); font-size: 16px;">Özel Yönlendirme Butonları</label>
+                        <p style="font-size: 12px; color: #555; margin-bottom: 10px;">Harita, sipariş, web sitesi veya sosyal medya için renkli butonlar ekleyin.</p>
+                        
+                        <div id="ekstra-butonlar-alani">
+                            </div>
+
+                        <button type="button" class="btn btn-add" style="margin-bottom: 0; margin-top: 10px; width: auto; padding: 8px 15px; font-size: 13px; border-color: var(--secondary); color: var(--secondary);" onclick="window.yeniButonEkle()">
+                            + Yeni Renkli Buton Ekle
+                        </button>
                     </div>
 
                     <div id="dinamikAlanlar"></div>
 
-                    <button type="button" class="btn btn-add" onclick="window.yeniYaziAlaniEkle()">+ Yeni Paragraf / Alt Bölüm Ekle</button>
-                    <button type="button" class="btn btn-submit" id="btn-kaydet" onclick="window.veritabaninaKaydet()">💾 Firebase'e Kaydet</button>
+                    <button type="button" class="btn btn-add" style="border: 1px dashed #7f8fa6; color: #333; background: #f1f2f6;" onclick="window.yeniYaziAlaniEkle()">
+                        + Yeni Alt Başlık ve Paragraf Ekle
+                    </button>
+                    
+                    <button type="button" class="btn btn-submit" id="btn-kaydet" onclick="window.veritabaninaKaydet()">
+                        💾 Firebase'e Kaydet
+                    </button>
                 </form>
             </section>
 
@@ -199,7 +213,7 @@
 
         </main>
     </div>
-        <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -222,7 +236,8 @@
             if(u === "admintrakya" && p === "tradmin5739") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'flex';
-                window.yeniFotoLinkiEkle(); // Başlangıçta 1 tane boş resim linki kutusu açsın
+                window.yeniFotoLinkiEkle(); // Boş foto alanı
+                window.yeniButonEkle(); // Boş buton alanı
                 window.icerikleriListele();
             } else {
                 alert("Kullanıcı adı veya şifre hatalı!");
@@ -241,7 +256,6 @@
         };
 
         window.altKategoriDoldur = function() {
-            // "A) Edirne" gibi formatları sadece "Edirne" yapıyoruz
             const ana = document.getElementById("anaKategori").value.split(') ')[1] || document.getElementById("anaKategori").value;
             const alt = document.getElementById("altKategori");
             alt.innerHTML = '<option value="">Seçiniz...</option>';
@@ -269,7 +283,10 @@
                 document.getElementById("btn-kaydet").innerHTML = "💾 Firebase'e Kaydet";
                 document.getElementById("dinamikAlanlar").innerHTML = "";
                 document.getElementById("foto-linkleri-alani").innerHTML = "";
-                window.yeniFotoLinkiEkle(); // 1 tane boş alan aç
+                document.getElementById("ekstra-butonlar-alani").innerHTML = "";
+                
+                window.yeniFotoLinkiEkle(); 
+                window.yeniButonEkle();
             } else {
                 document.getElementById('tab-liste-btn').classList.add('active');
                 document.getElementById('bolum-liste').style.display = 'block';
@@ -278,23 +295,40 @@
             }
         };
 
-        // --- ÇOKLU FOTOĞRAF LİNKİ EKLEME ---
-        let fotoSira = 0;
-        window.yeniFotoLinkiEkle = function(mevcutLink = "") {
-            fotoSira++;
+        // --- 1. DİNAMİK FOTOĞRAF LİNKİ & GÖRÜNÜM SEÇİMİ ---
+        window.yeniFotoLinkiEkle = function(mevcutLink = "", mevcutDuzen = "orta") {
             const alan = document.getElementById("foto-linkleri-alani");
             const div = document.createElement("div");
-            div.style.display = "flex";
-            div.style.gap = "10px";
-            div.style.marginBottom = "10px";
+            div.className = "foto-row";
             div.innerHTML = `
-                <input type="url" class="foto-link-input" placeholder="https://..." value="${mevcutLink}" style="flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px;">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:8px; padding:0 15px; cursor:pointer; font-size:12px;">✖ Sil</button>
+                <input type="url" class="foto-link-input" placeholder="Fotoğraf URL'si (https://...)" value="${mevcutLink}" style="flex: 2; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                <select class="foto-layout-select">
+                    <option value="tam" ${mevcutDuzen==='tam'?'selected':''}>Tam Genişlik</option>
+                    <option value="orta" ${mevcutDuzen==='orta'?'selected':''}>Ortala (Standart)</option>
+                    <option value="sol" ${mevcutDuzen==='sol'?'selected':''}>Sola Yasla</option>
+                    <option value="sag" ${mevcutDuzen==='sag'?'selected':''}>Sağa Yasla</option>
+                    <option value="ikili" ${mevcutDuzen==='ikili'?'selected':''}>İkili Yan Yana</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:0 15px; cursor:pointer; font-weight:bold;">✖</button>
             `;
             alan.appendChild(div);
         };
 
-        // --- DİNAMİK PARAGRAF EKLEME ---
+        // --- 2. DİNAMİK RENKLİ BUTON EKLEME ---
+        window.yeniButonEkle = function(isim = "", link = "", renk = "#e67e22") {
+            const alan = document.getElementById("ekstra-butonlar-alani");
+            const div = document.createElement("div");
+            div.className = "btn-ekle-blok";
+            div.innerHTML = `
+                <input type="text" class="btn-isim-input" placeholder="Buton İsmi (Örn: Sipariş Ver)" value="${isim}">
+                <input type="url" class="btn-link-input" placeholder="URL (https://...)" value="${link}">
+                <input type="color" class="btn-renk-input" value="${renk}" title="Buton Rengini Seçin">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:0 15px; cursor:pointer; font-weight:bold; height: 40px;">✖</button>
+            `;
+            alan.appendChild(div);
+        };
+
+        // --- 3. DİNAMİK PARAGRAF EKLEME ---
         let blokID = 0;
         window.yeniYaziAlaniEkle = function(baslik = "", metin = "") {
             blokID++;
@@ -311,28 +345,39 @@
 
         // --- KAYDET VEYA GÜNCELLE ---
         window.veritabaninaKaydet = async function() {
-            // "A) Edirne" olan veriyi "Edirne" olarak veritabanına kaydet
             const hamAna = document.getElementById("anaKategori").value;
             const ana = hamAna.split(') ')[1] || hamAna;
-            
             const alt = document.getElementById("altKategori").value;
             const baslik = document.getElementById("baslik").value;
             const editID = document.getElementById("editID").value;
             
-            if(!ana || !alt || !baslik) { alert("Eksik alan var!"); return; }
+            if(!ana || !alt || !baslik) { alert("Lütfen Kategori ve Başlık alanlarını doldurun!"); return; }
 
             document.getElementById('loader').style.display = 'flex';
             
             try {
-                // 1. Resim linklerini topla
-                let resimListesi = [];
-                document.querySelectorAll('.foto-link-input').forEach(input => {
-                    if(input.value.trim() !== "") {
-                        resimListesi.push(input.value.trim());
+                // 1. Gelişmiş Fotoğrafları Topla (URL + Düzen Tipi)
+                let fotografListesi = [];
+                document.querySelectorAll('.foto-row').forEach(row => {
+                    let url = row.querySelector('.foto-link-input').value.trim();
+                    let duzen = row.querySelector('.foto-layout-select').value;
+                    if(url !== "") {
+                        fotografListesi.push({ url: url, duzen: duzen });
                     }
                 });
 
-                // 2. Ekstra metin alanlarını topla
+                // 2. Renkli Butonları Topla
+                let butonListesi = [];
+                document.querySelectorAll('.btn-ekle-blok').forEach(row => {
+                    let isim = row.querySelector('.btn-isim-input').value.trim();
+                    let link = row.querySelector('.btn-link-input').value.trim();
+                    let renk = row.querySelector('.btn-renk-input').value;
+                    if(isim !== "" && link !== "") {
+                        butonListesi.push({ isim: isim, link: link, renk: renk });
+                    }
+                });
+
+                // 3. Ekstra metin alanlarını topla
                 let ekstralar = [];
                 document.querySelectorAll('.dynamic-block').forEach(b => {
                     ekstralar.push({
@@ -341,21 +386,26 @@
                     });
                 });
 
-                // 3. Veri Paketi
+                // 4. Veri Paketi Oluştur
                 const veriPaketi = {
-                    kategori: ana, // Düzeltilmiş isim gider (Örn: Edirne)
+                    kategori: ana,
                     alt_kategori: alt,
                     baslik: baslik,
-                    gorseller: resimListesi, // Çoklu Link Dizisi
-                    gorsel_url: resimListesi.length > 0 ? resimListesi[0] : "", // Geriye dönük uyumluluk
                     ana_metin: document.getElementById("anaMetin").value,
-                    link: document.getElementById("mekanLinki").value,
-                    link_isim: document.getElementById("linkIsmi").value || "Tıkla ve Git",
+                    
+                    // Yeni eklenen gelişmiş nesneler
+                    fotograflar: fotografListesi, 
+                    butonlar: butonListesi,
                     ekstra_icerikler: ekstralar,
-                    tarih: new Date().toLocaleString('tr-TR')
+                    tarih: new Date().toLocaleString('tr-TR'),
+
+                    // ESKİ SİTE ÇÖKMESİN DİYE YEDEK VERİLER (Ana site güncellenene kadar hata vermez)
+                    gorsel_url: fotografListesi.length > 0 ? fotografListesi[0].url : "", 
+                    link: butonListesi.length > 0 ? butonListesi[0].link : "",
+                    link_isim: butonListesi.length > 0 ? butonListesi[0].isim : "Tıkla ve Git"
                 };
 
-                // 4. Kayıt (Update veya Add)
+                // 5. Kayıt (Update veya Add)
                 if(editID) {
                     await updateDoc(doc(db, "icerikler", editID), veriPaketi);
                     alert("✅ İçerik Başarıyla GÜNCELLENDİ!");
@@ -420,7 +470,7 @@
             }
         };
 
-        // --- DÜZENLEME İŞLEMİ ---
+        // --- DÜZENLEME İŞLEMİ (Eski Formattan Yeni Formata Geçiş Uyumlu) ---
         window.icerikDuzenle = function(id) {
             const veri = tumIcerikler.find(x => x.id === id);
             if(!veri) return;
@@ -433,7 +483,6 @@
             
             document.getElementById("editID").value = veri.id;
             
-            // Kategori Eşleştirme ("Edirne" olan veriyi "A) Edirne" option'ına oturtmak için)
             const selectOptions = document.getElementById("anaKategori").options;
             for(let i=0; i<selectOptions.length; i++) {
                 if(selectOptions[i].value.includes(veri.kategori)) {
@@ -447,17 +496,31 @@
 
             document.getElementById("baslik").value = veri.baslik;
             document.getElementById("anaMetin").value = veri.ana_metin || "";
-            document.getElementById("mekanLinki").value = veri.link || "";
-            document.getElementById("linkIsmi").value = veri.link_isim || "Tıkla ve Git";
 
-            // Fotoğraf Linklerini Doldur
+            // Gelişmiş Fotoğraf Yükleme (Eski verilerle uyumlu)
             document.getElementById("foto-linkleri-alani").innerHTML = "";
-            if(veri.gorseller && veri.gorseller.length > 0) {
-                veri.gorseller.forEach(url => window.yeniFotoLinkiEkle(url));
-            } else if (veri.gorsel_url) { 
-                window.yeniFotoLinkiEkle(veri.gorsel_url);
+            if(veri.fotograflar && veri.fotograflar.length > 0) {
+                // Yeni format
+                veri.fotograflar.forEach(foto => window.yeniFotoLinkiEkle(foto.url, foto.duzen));
+            } else if (veri.gorseller && veri.gorseller.length > 0) {
+                // Bi ara eklediğimiz basit dizi formatı
+                veri.gorseller.forEach(url => window.yeniFotoLinkiEkle(url, "orta"));
+            } else if (veri.gorsel_url) {
+                // En eski tekil format
+                window.yeniFotoLinkiEkle(veri.gorsel_url, "orta");
             } else {
-                window.yeniFotoLinkiEkle(); 
+                window.yeniFotoLinkiEkle();
+            }
+
+            // Gelişmiş Buton Yükleme (Eski verilerle uyumlu)
+            document.getElementById("ekstra-butonlar-alani").innerHTML = "";
+            if(veri.butonlar && veri.butonlar.length > 0) {
+                veri.butonlar.forEach(b => window.yeniButonEkle(b.isim, b.link, b.renk));
+            } else if (veri.link) {
+                // Eski sistemde eklenmiş tekli buton varsa onu da kırmızı olarak getirir
+                window.yeniButonEkle(veri.link_isim || "Tıkla ve Git", veri.link, "#e74c3c");
+            } else {
+                window.yeniButonEkle();
             }
 
             // Dinamik alanları doldur
