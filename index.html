@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yönetim Paneli - Trakya Mutfağı</title>
+    <title>Yönetim Paneli - Trakya Mutfağı (Modüler)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -14,10 +13,12 @@
             --primary: #c0392b;
             --secondary: #2980b9;
             --success: #27ae60;
+            --warning: #f39c12;
             --text-dark: #2f3640;
             --text-light: #7f8fa6;
             --white: #ffffff;
             --border: #dcdde1;
+            --block-bg: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -55,37 +56,66 @@
         .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
         .topbar { background-color: var(--white); min-height: 70px; display: flex; align-items: center; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); justify-content: space-between; }
         
-        .form-container { background-color: var(--white); margin: 30px auto; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.05); width: 90%; max-width: 1000px; }
+        .form-container { margin: 30px auto; width: 90%; max-width: 1000px; padding-bottom: 50px; }
         
-        .form-row { display: flex; gap: 20px; margin-bottom: 25px; }
+        /* --- MODÜLER BLOK SİSTEMİ CSS --- */
+        .sabit-alan { background-color: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px; border-top: 4px solid var(--primary); }
+        
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
         .form-group { flex: 1; display: flex; flex-direction: column; }
-        .form-group label { font-size: 14px; color: var(--text-dark); font-weight: 600; margin-bottom: 10px; }
+        .form-group label { font-size: 14px; color: var(--text-dark); font-weight: 600; margin-bottom: 8px; }
         
-        input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: var(--main-bg); outline: none; transition: 0.3s; }
-        textarea { min-height: 150px; resize: vertical; }
-
-        .dynamic-block { background-color: #f8f9fa; border: 1px solid var(--border); padding: 25px; border-radius: 10px; margin-bottom: 20px; position: relative; border-left: 4px solid var(--secondary); }
-        .remove-block-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 5px; font-size: 12px; }
-
-        /* --- FOTOĞRAF VE BUTON ALANLARI YENİ CSS --- */
-        .foto-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-        .foto-layout-select { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; background: #f9f9f9; }
+        input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: #f9f9f9; outline: none; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--secondary); background-color: white; }
         
-        .btn-ekle-blok { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: #e8f4f8; padding: 15px; border-radius: 8px; border: 1px solid #bfe0eb; position: relative; flex-wrap: wrap;}
-        .btn-input { flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; }
-        .btn-color { width: 45px; height: 40px; padding: 0; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: white; }
+        /* Modül Kutuları */
+        #modul-alani { display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px; }
+        
+        .modul-kutu { 
+            background: var(--block-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            padding: 20px; 
+            position: relative; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-left: 5px solid #bdc3c7;
+        }
+        .modul-kutu.m-baslik { border-left-color: #3498db; }
+        .modul-kutu.m-metin { border-left-color: #2ecc71; }
+        .modul-kutu.m-foto { border-left-color: #9b59b6; }
+        .modul-kutu.m-buton { border-left-color: #e67e22; }
 
-        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
-        .btn-add { background-color: #f1f2f6; color: var(--secondary); border: 1px dashed var(--secondary); width: 100%; margin-bottom: 25px; }
-        .btn-submit { background-color: var(--success); color: white; width: 100%; font-size: 17px; }
+        .modul-baslik-etiketi { font-size: 12px; text-transform: uppercase; font-weight: 700; color: #7f8fa6; margin-bottom: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        
+        .modul-sil-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .modul-sil-btn:hover { background: #d63031; }
+
+        .modul-ic-row { display: flex; gap: 15px; align-items: center; }
+        textarea.modul-textarea { min-height: 100px; resize: vertical; }
+
+        /* Modül Ekleme Butonları Menüsü */
+        .modul-ekle-menu { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 30px; border: 2px dashed var(--border); }
+        .modul-ekle-menu p { font-size: 14px; color: var(--text-light); margin-bottom: 15px; }
+        .modul-btn-grup { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        
+        .btn-modul { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-m-baslik { background: #e1f0fa; color: #2980b9; }
+        .btn-m-metin { background: #e9f7ef; color: #27ae60; }
+        .btn-m-foto { background: #f4ecf8; color: #8e44ad; }
+        .btn-m-buton { background: #fdf2e9; color: #d35400; }
+        .btn-modul:hover { filter: brightness(0.95); transform: translateY(-2px); }
+
+        .btn-submit { background-color: var(--success); color: white; width: 100%; font-size: 18px; padding: 15px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); transition: 0.3s; }
+        .btn-submit:hover { background-color: #219a52; transform: translateY(-3px); }
 
         /* --- LİSTE TASARIMI --- */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background-color: var(--main-bg); color: var(--text-dark); }
-        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 5px; cursor: pointer; border: none; color: white; }
+        th { background-color: #f1f2f6; color: var(--text-dark); font-weight: 600; }
+        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 5px; cursor: pointer; border: none; color: white; transition: 0.2s; }
         .btn-edit { background-color: var(--secondary); margin-right: 5px; }
         .btn-delete { background-color: var(--primary); }
+        .btn-sm:hover { filter: brightness(0.9); }
     </style>
 </head>
 <body>
@@ -117,77 +147,58 @@
 
         <main class="main-content">
             <header class="topbar">
-                <h1 id="sayfa-basligi" style="font-size: 22px;">Yeni İçerik Ekle</h1>
+                <h1 id="sayfa-basligi" style="font-size: 22px;">Yeni İçerik Ekle (Modüler Sistem)</h1>
             </header>
 
             <section class="form-container" id="bolum-ekle">
                 <form id="icerikFormu">
                     <input type="hidden" id="editID">
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Şehir / Bölge Seçimi</label>
-                            <select id="anaKategori" onchange="window.altKategoriDoldur()" required>
-                                <option value="">Seçiniz...</option>
-                                <option value="Edirne">A) Edirne</option>
-                                <option value="Tekirdağ">B) Tekirdağ</option>
-                                <option value="Kırklareli">C) Kırklareli</option>
-                                <option value="Çanakkale">D) Çanakkale</option>
-                                <option value="Sakin_Sehirler">E) Sakin Şehirler</option>
-                                <option value="Turk_Mutfagi">F) Türk Mutfağı</option>
-                                <option value="Dunya_Mutfagi">G) Dünya Mutfağı</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Alt Kategori (Bölüm)</label>
-                            <select id="altKategori" required>
-                                <option value="">Önce şehir seçin</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Başlık</label>
-                        <input type="text" id="baslik" placeholder="Başlık giriniz (Örn: Meşhur Köfteci)..." required>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px; background: #fdf2e9; padding: 20px; border-radius: 8px; border: 1px dashed var(--primary);">
-                        <label style="color: var(--primary); font-size: 16px;">Fotoğraflar ve Görünüm Düzeni</label>
-                        <p style="font-size: 12px; color: #555; margin-bottom: 10px;">Fotoğraf URL'sini yapıştırın ve sayfada nerede duracağını seçin.</p>
-                        
-                        <div id="foto-linkleri-alani">
+                    <div class="sabit-alan">
+                        <h3 style="margin-bottom: 20px; color: var(--primary); font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">1. İçerik Kimliği (Zorunlu Alanlar)</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Şehir / Bölge Seçimi</label>
+                                <select id="anaKategori" onchange="window.altKategoriDoldur()" required>
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Edirne">A) Edirne</option>
+                                    <option value="Tekirdağ">B) Tekirdağ</option>
+                                    <option value="Kırklareli">C) Kırklareli</option>
+                                    <option value="Çanakkale">D) Çanakkale</option>
+                                    <option value="Sakin_Sehirler">E) Sakin Şehirler</option>
+                                    <option value="Turk_Mutfagi">F) Türk Mutfağı</option>
+                                    <option value="Dunya_Mutfagi">G) Dünya Mutfağı</option>
+                                </select>
                             </div>
-                        
-                        <button type="button" class="btn btn-add" style="margin-bottom: 0; margin-top: 10px; width: auto; padding: 8px 15px; font-size: 13px;" onclick="window.yeniFotoLinkiEkle()">
-                            + Yeni Fotoğraf Ekle
-                        </button>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Ana Açıklama Metni</label>
-                        <textarea id="anaMetin" placeholder="Genel bilgileri buraya yazın..."></textarea>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 25px; background: #f0f7fa; padding: 20px; border-radius: 8px; border: 1px dashed var(--secondary);">
-                        <label style="color: var(--secondary); font-size: 16px;">Özel Yönlendirme Butonları</label>
-                        <p style="font-size: 12px; color: #555; margin-bottom: 10px;">Harita, sipariş, web sitesi veya sosyal medya için renkli butonlar ekleyin.</p>
-                        
-                        <div id="ekstra-butonlar-alani">
+                            <div class="form-group">
+                                <label>Alt Kategori (Bölüm)</label>
+                                <select id="altKategori" required>
+                                    <option value="">Önce şehir seçin</option>
+                                </select>
                             </div>
+                        </div>
 
-                        <button type="button" class="btn btn-add" style="margin-bottom: 0; margin-top: 10px; width: auto; padding: 8px 15px; font-size: 13px; border-color: var(--secondary); color: var(--secondary);" onclick="window.yeniButonEkle()">
-                            + Yeni Renkli Buton Ekle
-                        </button>
+                        <div class="form-group">
+                            <label>Ana Başlık (Menüde ve sayfanın en üstünde bu görünecek)</label>
+                            <input type="text" id="baslik" placeholder="Örn: Meşhur Tarihi Ciğerci..." required>
+                        </div>
                     </div>
 
-                    <div id="dinamikAlanlar"></div>
+                    <div id="modul-alani">
+                        </div>
 
-                    <button type="button" class="btn btn-add" style="border: 1px dashed #7f8fa6; color: #333; background: #f1f2f6;" onclick="window.yeniYaziAlaniEkle()">
-                        + Yeni Alt Başlık ve Paragraf Ekle
-                    </button>
-                    
-                    <button type="button" class="btn btn-submit" id="btn-kaydet" onclick="window.veritabaninaKaydet()">
-                        💾 Firebase'e Kaydet
+                    <div class="modul-ekle-menu">
+                        <p>Sayfanızı adım adım tasarlayın. Sıradaki bloğu seçin:</p>
+                        <div class="modul-btn-grup">
+                            <button type="button" class="btn-modul btn-m-baslik" onclick="window.modulEkle('baslik')">📝 Alt Başlık</button>
+                            <button type="button" class="btn-modul btn-m-metin" onclick="window.modulEkle('metin')">📃 Paragraf (Metin)</button>
+                            <button type="button" class="btn-modul btn-m-foto" onclick="window.modulEkle('foto')">🖼️ Fotoğraf</button>
+                            <button type="button" class="btn-modul btn-m-buton" onclick="window.modulEkle('buton')">🔗 Renkli Buton</button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-submit" id="btn-kaydet" onclick="window.veritabaninaKaydet()">
+                        💾 İçeriği Firebase'e Kaydet
                     </button>
                 </form>
             </section>
@@ -236,8 +247,6 @@
             if(u === "admintrakya" && p === "tradmin5739") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'flex';
-                window.yeniFotoLinkiEkle(); // Boş foto alanı
-                window.yeniButonEkle(); // Boş buton alanı
                 window.icerikleriListele();
             } else {
                 alert("Kullanıcı adı veya şifre hatalı!");
@@ -276,17 +285,12 @@
             if(sekme === 'ekle') {
                 document.getElementById('tab-ekle-btn').classList.add('active');
                 document.getElementById('bolum-ekle').style.display = 'block';
-                document.getElementById('sayfa-basligi').innerText = "Yeni İçerik Ekle";
+                document.getElementById('sayfa-basligi').innerText = "Yeni İçerik Ekle (Modüler Sistem)";
                 
                 document.getElementById("icerikFormu").reset();
                 document.getElementById("editID").value = "";
-                document.getElementById("btn-kaydet").innerHTML = "💾 Firebase'e Kaydet";
-                document.getElementById("dinamikAlanlar").innerHTML = "";
-                document.getElementById("foto-linkleri-alani").innerHTML = "";
-                document.getElementById("ekstra-butonlar-alani").innerHTML = "";
-                
-                window.yeniFotoLinkiEkle(); 
-                window.yeniButonEkle();
+                document.getElementById("btn-kaydet").innerHTML = "💾 İçeriği Firebase'e Kaydet";
+                document.getElementById("modul-alani").innerHTML = ""; // Ekranı temizle
             } else {
                 document.getElementById('tab-liste-btn').classList.add('active');
                 document.getElementById('bolum-liste').style.display = 'block';
@@ -295,52 +299,47 @@
             }
         };
 
-        // --- 1. DİNAMİK FOTOĞRAF LİNKİ & GÖRÜNÜM SEÇİMİ ---
-        window.yeniFotoLinkiEkle = function(mevcutLink = "", mevcutDuzen = "orta") {
-            const alan = document.getElementById("foto-linkleri-alani");
+        // --- ⚡ SİHİRLİ KISIM: DİNAMİK MODÜL EKLEME ⚡ ---
+        window.modulEkle = function(tip, veri = {}) {
+            const alan = document.getElementById("modul-alani");
             const div = document.createElement("div");
-            div.className = "foto-row";
-            div.innerHTML = `
-                <input type="url" class="foto-link-input" placeholder="Fotoğraf URL'si (https://...)" value="${mevcutLink}" style="flex: 2; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
-                <select class="foto-layout-select">
-                    <option value="tam" ${mevcutDuzen==='tam'?'selected':''}>Tam Genişlik</option>
-                    <option value="orta" ${mevcutDuzen==='orta'?'selected':''}>Ortala (Standart)</option>
-                    <option value="sol" ${mevcutDuzen==='sol'?'selected':''}>Sola Yasla</option>
-                    <option value="sag" ${mevcutDuzen==='sag'?'selected':''}>Sağa Yasla</option>
-                    <option value="ikili" ${mevcutDuzen==='ikili'?'selected':''}>İkili Yan Yana</option>
-                </select>
-                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:0 15px; cursor:pointer; font-weight:bold;">✖</button>
-            `;
-            alan.appendChild(div);
-        };
+            div.className = `modul-kutu m-${tip}`;
+            div.dataset.tip = tip; // Kaydederken ne tür olduğunu anlamak için
+            
+            let ic_html = `<button type="button" class="modul-sil-btn" onclick="this.parentElement.remove()">✖ Sil</button>`;
 
-        // --- 2. DİNAMİK RENKLİ BUTON EKLEME ---
-        window.yeniButonEkle = function(isim = "", link = "", renk = "#e67e22") {
-            const alan = document.getElementById("ekstra-butonlar-alani");
-            const div = document.createElement("div");
-            div.className = "btn-ekle-blok";
-            div.innerHTML = `
-                <input type="text" class="btn-isim-input" placeholder="Buton İsmi (Örn: Sipariş Ver)" value="${isim}">
-                <input type="url" class="btn-link-input" placeholder="URL (https://...)" value="${link}">
-                <input type="color" class="btn-renk-input" value="${renk}" title="Buton Rengini Seçin">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:0 15px; cursor:pointer; font-weight:bold; height: 40px;">✖</button>
-            `;
-            alan.appendChild(div);
-        };
+            if(tip === 'baslik') {
+                ic_html += `<span class="modul-baslik-etiketi">📝 ALT BAŞLIK BLOĞU</span>`;
+                ic_html += `<input type="text" class="mod-v1" placeholder="Dikkat Çekici Bir Alt Başlık Yazın..." value="${veri.icerik || ''}">`;
+            } 
+            else if(tip === 'metin') {
+                ic_html += `<span class="modul-baslik-etiketi" style="color:#2ecc71;">📃 PARAGRAF BLOĞU</span>`;
+                ic_html += `<textarea class="mod-v1 modul-textarea" placeholder="İçeriğinizi buraya yazın veya yapıştırın...">${veri.icerik || ''}</textarea>`;
+            }
+            else if(tip === 'foto') {
+                ic_html += `<span class="modul-baslik-etiketi" style="color:#9b59b6;">🖼️ FOTOĞRAF BLOĞU</span>`;
+                ic_html += `<div class="modul-ic-row">`;
+                ic_html += `<input type="url" class="mod-v1" style="flex:2;" placeholder="Fotoğraf URL (https://...)" value="${veri.url || ''}">`;
+                ic_html += `<select class="mod-v2" style="flex:1;">
+                                <option value="tam" ${veri.duzen==='tam'?'selected':''}>Tam Genişlik</option>
+                                <option value="orta" ${veri.duzen==='orta'?'selected':''}>Ortala (Standart)</option>
+                                <option value="sol" ${veri.duzen==='sol'?'selected':''}>Sola Yasla</option>
+                                <option value="sag" ${veri.duzen==='sag'?'selected':''}>Sağa Yasla</option>
+                                <option value="ikili" ${veri.duzen==='ikili'?'selected':''}>İkili (Yan Yana)</option>
+                            </select>`;
+                ic_html += `</div>`;
+            }
+            else if(tip === 'buton') {
+                ic_html += `<span class="modul-baslik-etiketi" style="color:#e67e22;">🔗 RENKLİ BUTON BLOĞU</span>`;
+                ic_html += `<div class="modul-ic-row">`;
+                ic_html += `<input type="text" class="mod-v1" placeholder="Butonda Ne Yazsın?" value="${veri.isim || ''}">`;
+                ic_html += `<input type="url" class="mod-v2" placeholder="Gideceği URL" value="${veri.link || ''}">`;
+                ic_html += `<input type="color" class="mod-v3 btn-color" value="${veri.renk || '#e74c3c'}" title="Buton Rengi">`;
+                ic_html += `</div>`;
+            }
 
-        // --- 3. DİNAMİK PARAGRAF EKLEME ---
-        let blokID = 0;
-        window.yeniYaziAlaniEkle = function(baslik = "", metin = "") {
-            blokID++;
-            const div = document.createElement("div");
-            div.className = "dynamic-block";
-            div.id = `block_${blokID}`;
-            div.innerHTML = `
-                <button type="button" class="remove-block-btn" onclick="document.getElementById('block_${blokID}').remove()">✖ Kaldır</button>
-                <input type="text" class="d-baslik" placeholder="Alt Başlık (Örn: Malzemeler)" style="margin-bottom:10px" value="${baslik}">
-                <textarea class="d-metin" style="min-height:80px" placeholder="Bölüm içeriği veya detaylar...">${metin}</textarea>
-            `;
-            document.getElementById("dinamikAlanlar").appendChild(div);
+            div.innerHTML = ic_html;
+            alan.appendChild(div);
         };
 
         // --- KAYDET VEYA GÜNCELLE ---
@@ -351,67 +350,47 @@
             const baslik = document.getElementById("baslik").value;
             const editID = document.getElementById("editID").value;
             
-            if(!ana || !alt || !baslik) { alert("Lütfen Kategori ve Başlık alanlarını doldurun!"); return; }
+            if(!ana || !alt || !baslik) { alert("Lütfen Şehir, Alt Kategori ve Ana Başlık alanlarını doldurun!"); return; }
 
             document.getElementById('loader').style.display = 'flex';
             
             try {
-                // 1. Gelişmiş Fotoğrafları Topla (URL + Düzen Tipi)
-                let fotografListesi = [];
-                document.querySelectorAll('.foto-row').forEach(row => {
-                    let url = row.querySelector('.foto-link-input').value.trim();
-                    let duzen = row.querySelector('.foto-layout-select').value;
-                    if(url !== "") {
-                        fotografListesi.push({ url: url, duzen: duzen });
+                // MODÜLLERİ SIRASIYLA TOPLA
+                let siraliModuller = [];
+                
+                document.querySelectorAll('.modul-kutu').forEach(kutu => {
+                    let tip = kutu.dataset.tip;
+                    
+                    if(tip === 'baslik' && kutu.querySelector('.mod-v1').value.trim() !== "") {
+                        siraliModuller.push({ tip: 'baslik', icerik: kutu.querySelector('.mod-v1').value });
+                    } 
+                    else if(tip === 'metin' && kutu.querySelector('.mod-v1').value.trim() !== "") {
+                        siraliModuller.push({ tip: 'metin', icerik: kutu.querySelector('.mod-v1').value });
+                    } 
+                    else if(tip === 'foto' && kutu.querySelector('.mod-v1').value.trim() !== "") {
+                        siraliModuller.push({ tip: 'foto', url: kutu.querySelector('.mod-v1').value, duzen: kutu.querySelector('.mod-v2').value });
+                    } 
+                    else if(tip === 'buton' && kutu.querySelector('.mod-v1').value.trim() !== "" && kutu.querySelector('.mod-v2').value.trim() !== "") {
+                        siraliModuller.push({ tip: 'buton', isim: kutu.querySelector('.mod-v1').value, link: kutu.querySelector('.mod-v2').value, renk: kutu.querySelector('.mod-v3').value });
                     }
                 });
 
-                // 2. Renkli Butonları Topla
-                let butonListesi = [];
-                document.querySelectorAll('.btn-ekle-blok').forEach(row => {
-                    let isim = row.querySelector('.btn-isim-input').value.trim();
-                    let link = row.querySelector('.btn-link-input').value.trim();
-                    let renk = row.querySelector('.btn-renk-input').value;
-                    if(isim !== "" && link !== "") {
-                        butonListesi.push({ isim: isim, link: link, renk: renk });
-                    }
-                });
-
-                // 3. Ekstra metin alanlarını topla
-                let ekstralar = [];
-                document.querySelectorAll('.dynamic-block').forEach(b => {
-                    ekstralar.push({
-                        altBaslik: b.querySelector('.d-baslik').value,
-                        icerik: b.querySelector('.d-metin').value
-                    });
-                });
-
-                // 4. Veri Paketi Oluştur
+                // Veri Paketi Oluştur (YENİ SİSTEM)
                 const veriPaketi = {
                     kategori: ana,
                     alt_kategori: alt,
                     baslik: baslik,
-                    ana_metin: document.getElementById("anaMetin").value,
-                    
-                    // Yeni eklenen gelişmiş nesneler
-                    fotograflar: fotografListesi, 
-                    butonlar: butonListesi,
-                    ekstra_icerikler: ekstralar,
-                    tarih: new Date().toLocaleString('tr-TR'),
-
-                    // ESKİ SİTE ÇÖKMESİN DİYE YEDEK VERİLER (Ana site güncellenene kadar hata vermez)
-                    gorsel_url: fotografListesi.length > 0 ? fotografListesi[0].url : "", 
-                    link: butonListesi.length > 0 ? butonListesi[0].link : "",
-                    link_isim: butonListesi.length > 0 ? butonListesi[0].isim : "Tıkla ve Git"
+                    moduller: siraliModuller, // Artık her şey bu dizinin içinde sırasıyla duruyor!
+                    tarih: new Date().toLocaleString('tr-TR')
                 };
 
-                // 5. Kayıt (Update veya Add)
+                // Kayıt
                 if(editID) {
                     await updateDoc(doc(db, "icerikler", editID), veriPaketi);
                     alert("✅ İçerik Başarıyla GÜNCELLENDİ!");
                 } else {
                     await addDoc(collection(db, "icerikler"), veriPaketi);
-                    alert("✅ İçerik Başarıyla EKLENDİ!");
+                    alert("✅ Yeni İçerik EKLENDİ!");
                 }
 
                 document.getElementById('loader').style.display = 'none';
@@ -470,19 +449,16 @@
             }
         };
 
-        // --- DÜZENLEME İŞLEMİ (Eski Formattan Yeni Formata Geçiş Uyumlu) ---
+        // --- DÜZENLEME (ESKİ SİSTEMDEN YENİ MODÜLER SİSTEME MİGRASYON) ---
         window.icerikDuzenle = function(id) {
             const veri = tumIcerikler.find(x => x.id === id);
             if(!veri) return;
 
-            document.getElementById('tab-ekle-btn').classList.add('active');
-            document.getElementById('tab-liste-btn').classList.remove('active');
-            document.getElementById('bolum-ekle').style.display = 'block';
-            document.getElementById('bolum-liste').style.display = 'none';
+            window.sekmeyiDegistir('ekle');
             document.getElementById('sayfa-basligi').innerText = "İçeriği Düzenle";
-            
             document.getElementById("editID").value = veri.id;
             
+            // Kategori Eşleştirme
             const selectOptions = document.getElementById("anaKategori").options;
             for(let i=0; i<selectOptions.length; i++) {
                 if(selectOptions[i].value.includes(veri.kategori)) {
@@ -490,45 +466,48 @@
                     break;
                 }
             }
-            
             window.altKategoriDoldur(); 
             setTimeout(() => { document.getElementById("altKategori").value = veri.alt_kategori; }, 100);
 
             document.getElementById("baslik").value = veri.baslik;
-            document.getElementById("anaMetin").value = veri.ana_metin || "";
+            
+            // Ekranı temizle
+            document.getElementById("modul-alani").innerHTML = "";
 
-            // Gelişmiş Fotoğraf Yükleme (Eski verilerle uyumlu)
-            document.getElementById("foto-linkleri-alani").innerHTML = "";
-            if(veri.fotograflar && veri.fotograflar.length > 0) {
-                // Yeni format
-                veri.fotograflar.forEach(foto => window.yeniFotoLinkiEkle(foto.url, foto.duzen));
-            } else if (veri.gorseller && veri.gorseller.length > 0) {
-                // Bi ara eklediğimiz basit dizi formatı
-                veri.gorseller.forEach(url => window.yeniFotoLinkiEkle(url, "orta"));
-            } else if (veri.gorsel_url) {
-                // En eski tekil format
-                window.yeniFotoLinkiEkle(veri.gorsel_url, "orta");
-            } else {
-                window.yeniFotoLinkiEkle();
-            }
-
-            // Gelişmiş Buton Yükleme (Eski verilerle uyumlu)
-            document.getElementById("ekstra-butonlar-alani").innerHTML = "";
-            if(veri.butonlar && veri.butonlar.length > 0) {
-                veri.butonlar.forEach(b => window.yeniButonEkle(b.isim, b.link, b.renk));
-            } else if (veri.link) {
-                // Eski sistemde eklenmiş tekli buton varsa onu da kırmızı olarak getirir
-                window.yeniButonEkle(veri.link_isim || "Tıkla ve Git", veri.link, "#e74c3c");
-            } else {
-                window.yeniButonEkle();
-            }
-
-            // Dinamik alanları doldur
-            document.getElementById("dinamikAlanlar").innerHTML = "";
-            if(veri.ekstra_icerikler) {
-                veri.ekstra_icerikler.forEach(ekstra => {
-                    window.yeniYaziAlaniEkle(ekstra.altBaslik, ekstra.icerik);
+            // EĞER İÇERİK YENİ MODÜLER SİSTEMLE EKLENMİŞSE
+            if(veri.moduller && veri.moduller.length > 0) {
+                veri.moduller.forEach(m => {
+                    window.modulEkle(m.tip, m);
                 });
+            } 
+            // EĞER İÇERİK ESKİ SİSTEMLE EKLENMİŞSE (Otomatik Modüllere Çevirir)
+            else {
+                // Eski Ana Fotoğraf
+                if(veri.fotograflar && veri.fotograflar.length > 0) {
+                    veri.fotograflar.forEach(f => window.modulEkle('foto', f));
+                } else if(veri.gorsel_url) {
+                    window.modulEkle('foto', { url: veri.gorsel_url, duzen: 'tam' });
+                }
+
+                // Eski Ana Metin
+                if(veri.ana_metin) {
+                    window.modulEkle('metin', { icerik: veri.ana_metin });
+                }
+
+                // Eski Alt Başlık ve İçerikler
+                if(veri.ekstra_icerikler) {
+                    veri.ekstra_icerikler.forEach(e => {
+                        if(e.altBaslik) window.modulEkle('baslik', { icerik: e.altBaslik });
+                        if(e.icerik) window.modulEkle('metin', { icerik: e.icerik });
+                    });
+                }
+
+                // Eski Butonlar
+                if(veri.butonlar && veri.butonlar.length > 0) {
+                    veri.butonlar.forEach(b => window.modulEkle('buton', b));
+                } else if (veri.link) {
+                    window.modulEkle('buton', { isim: veri.link_isim || 'Tıkla ve Git', link: veri.link, renk: '#e74c3c' });
+                }
             }
 
             document.getElementById("btn-kaydet").innerHTML = "🔄 Değişiklikleri Güncelle";
