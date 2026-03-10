@@ -460,11 +460,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // SİLME İŞLEMLERİ
+// SİLME İŞLEMLERİ (GÜNCELLENDİ: ANINDA FİREBASE'DEN SİLER)
         window.kategoriSil = function(anaKat) {
             if (confirm("DİKKAT: '" + anaKat + "' şehrini ve İÇİNDEKİ HER ŞEYİ silmek istediğinize emin misiniz?")) {
                 delete kategoriler[anaKat]; 
                 window.kategorileriEkranaCiz();
+                window.kategorileriFirebaseKaydet(false); // Arka planda sessizce kaydet
             }
         };
         
@@ -472,6 +473,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             if (confirm("'" + altKatAdi + "' kategorisini silmek istiyor musunuz?")) {
                 delete kategoriler[anaKat][altKatAdi]; 
                 window.kategorileriEkranaCiz();
+                window.kategorileriFirebaseKaydet(false); 
             }
         };
         
@@ -479,16 +481,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             if (confirm("Bu alt menüyü kaldırmak istediğinize emin misiniz?")) {
                 kategoriler[anaKat][altKatAdi].splice(index, 1); 
                 window.kategorileriEkranaCiz();
+                window.kategorileriFirebaseKaydet(false); 
             }
         };
 
         // FİREBASE'E KAYDETME
-        window.kategorileriFirebaseKaydet = async function() {
+        window.kategorileriFirebaseKaydet = async function(uyariGoster = true) {
             document.getElementById('loader').style.display = 'flex';
             try {
                 const docRef = doc(db, "ayarlar", "menuler_v4");
                 await setDoc(docRef, kategoriler); 
-                alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
+                if(uyariGoster) alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
             } catch (error) {
                 console.error("Kaydetme hatası:", error); 
                 alert("Kaydetme hatası oluştu, internetini kontrol et!");
