@@ -275,16 +275,46 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 alert("Kullanıcı adı veya şifre hatalı!");
             }
         };
+// --- ⚡ 3 SEVİYELİ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
 
-  // --- ⚡ 3 SEVİYELİ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
-
-        // Yeni Ağaç Yapısı: Ana Kategori -> Alt Kategori -> [Alt-Alt Kategoriler]
+        // Yepyeni, eksiksiz Ağaç Yapısı
         let kategoriler = {
             "Edirne": {
                 "Edirne Hakkında": [],
                 "Coğrafi İşaretli Ürünler": [],
                 "Edirne Lezzet Durakları": [],
                 "Edirne Mutfağı": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
+            },
+            "Tekirdağ": {
+                "Tekirdağ Hakkında": [],
+                "Coğrafi İşaretli Ürünler": [],
+                "Tekirdağ Lezzet Durakları": [],
+                "Tekirdağ Mutfağı": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
+            },
+            "Kırklareli": {
+                "Kırklareli Hakkında": [],
+                "Coğrafi İşaretli Ürünler": [],
+                "Kırklareli Lezzet Durakları": [],
+                "Kırklareli Mutfağı": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
+            },
+            "Çanakkale": {
+                "Çanakkale Hakkında": [],
+                "Coğrafi İşaretli Ürünler": [],
+                "Çanakkale Lezzet Durakları": [],
+                "Çanakkale Mutfağı": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
+            },
+            "Sakin_Sehirler": {
+                "Sakin Şehirler Hakkında": [],
+                "Sakin Şehirler": ["Gökçeada, Çanakkale", "Foça, İzmir", "Seferihisar, İzmir", "Şarköy, Tekirdağ", "Vize, Kırklareli", "Yenipazar, Aydın", "Akyaka, Muğla", "Köyceğiz, Muğla", "Çameli, Denizli", "İznik, Bursa", "Demre, Antalya", "Finike, Antalya", "Göynük, Bolu", "Mudurnu, Bolu", "Yalvaç, Isparta", "İbradı, Antalya", "Eğirdir, Isparta", "Güdül, Ankara", "Safranbolu, Karabük", "Daday, Kastamonu", "Gerze, Sinop", "Perşembe, Ordu", "Halfeti, Şanlıurfa", "Arapgir, Malatya", "Kemaliye, Erzincan", "Uzundere, Erzurum", "Şavşat, Artvin", "Ahlat, Bitlis"]
+            },
+            "Turk_Mutfagi": {
+                "Türk Mutfağı Hakkında": [],
+                "Coğrafi İşaretli Ürünler": [],
+                "Lezzet Durakları": [],
+                "Türk Mutfağından Seçmeler": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
+            },
+            "Dunya_Mutfagi": {
+                "Dünya Mutfağından Seçmeler": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
             }
         };
 
@@ -297,19 +327,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             if(ana && kategoriler[ana]) {
                 for (const [altKatAdi, altAltDizisi] of Object.entries(kategoriler[ana])) {
                     if(altAltDizisi.length === 0) {
-                        // Eğer alt kategorinin kendi alt menüsü yoksa direkt ekle (Örn: Edirne Hakkında)
                         let o = document.createElement("option"); o.value = altKatAdi; o.innerText = altKatAdi; alt.appendChild(o);
                     } else {
-                        // Eğer alt menüsü varsa (Örn: Edirne Mutfağı), başlığı seçilemez yap, altındakileri seçtir
                         let grup = document.createElement("optgroup");
                         grup.label = "--- " + altKatAdi + " ---";
                         alt.appendChild(grup);
 
                         altAltDizisi.forEach(secenek => {
-                            let o = document.createElement("option"); 
-                            o.value = secenek; // Veritabanına "Et Yemekleri" diye kaydeder
-                            o.innerText = secenek; 
-                            alt.appendChild(o);
+                            let o = document.createElement("option"); o.value = secenek; o.innerText = secenek; alt.appendChild(o);
                         });
                     }
                 }
@@ -319,7 +344,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
         // Sayfa açıldığında menüleri Firebase'den çek
         window.menuleriFirebaseDenCek = async function() {
             try {
-                const docRef = doc(db, "ayarlar", "menuler");
+                // DİKKAT: Eski hatalı veriyi okumasın diye adını "menuler_v3" yaptık!
+                const docRef = doc(db, "ayarlar", "menuler_v3");
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
@@ -347,7 +373,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 for (const [altKatAdi, altAltDizisi] of Object.entries(altKatObjesi)) {
                     let ucuncuSeviyeHtml = "";
                     
-                    // 3. SEVİYE (Örn: Et Yemekleri)
+                    // 3. SEVİYE 
                     altAltDizisi.forEach((enAlt, index) => {
                         ucuncuSeviyeHtml += `
                             <div style="display:flex; justify-content:space-between; padding:8px 10px; border-bottom:1px dashed #ddd; background:#fff; margin-bottom:3px; margin-left:30px; border-left:3px solid var(--secondary);">
@@ -357,7 +383,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                         `;
                     });
 
-                    // 2. SEVİYE (Örn: Edirne Mutfağı)
+                    // 2. SEVİYE 
                     altKatHtml += `
                         <div style="background:#f9f9f9; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #eee;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -372,7 +398,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                     `;
                 }
 
-                // 1. SEVİYE (Ana Kutu - Örn: Edirne)
+                // 1. SEVİYE 
                 listeAlani.innerHTML += `
                     <div style="background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 25px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
@@ -394,7 +420,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             const gorunenAd = input.value.trim();
             if (!gorunenAd) return alert("Lütfen bir isim yazın!");
             if (kategoriler[gorunenAd]) return alert("Bu kategori zaten var!");
-            kategoriler[gorunenAd] = {}; // Yeni boş obje oluştur
+            kategoriler[gorunenAd] = {}; 
             input.value = "";
             window.kategorileriEkranaCiz(); 
         };
@@ -403,7 +429,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             const yeniAlt = prompt(`${anaKat} için yeni kategori ismini girin:\n(Örn: Edirne Mutfağı veya Tarihi Yerler)`);
             if (yeniAlt && yeniAlt.trim() !== "") {
                 if(kategoriler[anaKat][yeniAlt.trim()]) return alert("Bu isimde bir kategori zaten mevcut!");
-                kategoriler[anaKat][yeniAlt.trim()] = []; // Boş dizi ile oluştur
+                kategoriler[anaKat][yeniAlt.trim()] = []; 
                 window.kategorileriEkranaCiz();
             }
         };
@@ -436,7 +462,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
         window.kategorileriFirebaseKaydet = async function() {
             document.getElementById('loader').style.display = 'flex';
             try {
-                const docRef = doc(db, "ayarlar", "menuler");
+                // Kaydederken de menuler_v3 dosyasına kaydediyoruz!
+                const docRef = doc(db, "ayarlar", "menuler_v3");
                 await setDoc(docRef, kategoriler); 
                 alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
             } catch (error) {
