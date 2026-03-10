@@ -239,7 +239,7 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -333,7 +333,8 @@
 
         window.menuleriFirebaseDenCek = async function() {
             try {
-                const docRef = doc(db, "ayarlar", "menuler_v3");
+                // Temiz sayfa açmak için v4 yaptık
+                const docRef = doc(db, "ayarlar", "menuler_v4");
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
@@ -356,9 +357,12 @@
 
             for (const [anaKat, altKatObjesi] of Object.entries(kategoriler)) {
                 let altKatHtml = "";
+                const safeAnaKat = anaKat.replace(/[^a-zA-Z0-9]/g, '_');
                 
                 for (const [altKatAdi, altAltDizisi] of Object.entries(altKatObjesi)) {
                     let ucuncuSeviyeHtml = "";
+                    const safeAltKat = altKatAdi.replace(/[^a-zA-Z0-9]/g, '_');
+                    const id3 = `alt_${safeAnaKat}_${safeAltKat}`;
                     
                     altAltDizisi.forEach((enAlt, index) => {
                         ucuncuSeviyeHtml += `
@@ -369,19 +373,33 @@
                         `;
                     });
 
+                    // 3. Seviye İçin Metin Kutusu ve Buton (Popup Yok!)
+                    ucuncuSeviyeHtml += `
+                        <div style="display:flex; gap:5px; margin-left:30px; margin-top:5px;">
+                            <input type="text" id="${id3}" placeholder="Yeni alt menü (Örn: Çorbalar)" style="flex:1; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px;">
+                            <button type="button" class="btn-sm" style="background:#2ecc71; padding:6px 10px;" onclick="window.ucuncuSeviyeEkle('${anaKat}', '${altKatAdi}', '${id3}')">Ekle</button>
+                        </div>
+                    `;
+
                     altKatHtml += `
                         <div style="background:#f9f9f9; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #eee;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                                 <span style="font-size:15px; font-weight:600; color:#2c3e50;">📂 ${altKatAdi}</span>
-                                <div>
-                                    <button type="button" class="btn-sm" style="background:#2ecc71; padding:6px 10px;" onclick="window.ucuncuSeviyeEkle('${anaKat}', '${altKatAdi}')">+ Alt Menü Ekle</button>
-                                    <button type="button" class="btn-sm" style="background:#c0392b; padding:6px 10px;" onclick="window.ikinciSeviyeSil('${anaKat}', '${altKatAdi}')">Sil</button>
-                                </div>
+                                <button type="button" class="btn-sm" style="background:#c0392b; padding:6px 10px;" onclick="window.ikinciSeviyeSil('${anaKat}', '${altKatAdi}')">Kategoriyi Sil</button>
                             </div>
                             ${ucuncuSeviyeHtml}
                         </div>
                     `;
                 }
+
+                // 2. Seviye İçin Metin Kutusu ve Buton (Popup Yok!)
+                const id2 = `kat_${safeAnaKat}`;
+                altKatHtml += `
+                    <div style="display:flex; gap:10px; margin-top:15px; border-top:1px dashed #ccc; padding-top:15px;">
+                        <input type="text" id="${id2}" placeholder="Yeni kategori adı (Örn: Tarihi Yerler)" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:4px;">
+                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; padding:8px 15px;" onclick="window.ikinciSeviyeEkle('${anaKat}', '${id2}')">+ Kategori Ekle</button>
+                    </div>
+                `;
 
                 listeAlani.innerHTML += `
                     <div style="background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 25px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
@@ -392,13 +410,12 @@
                         <div style="margin-bottom:15px;">
                             ${altKatHtml}
                         </div>
-                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; width:100%; padding:10px; font-size:14px;" onclick="window.ikinciSeviyeEkle('${anaKat}')">➕ Bu Şehre Yeni Kategori Ekle</button>
                     </div>
                 `;
             }
         };
 
-        // EKLEME İŞLEMLERİ
+        // EKLEME İŞLEMLERİ (Yeni Kutu Okuyucular)
         window.anaKategoriEkle = function() {
             const input = document.getElementById("yeni-ana-kat-ad");
             const gorunenAd = input.value.trim();
@@ -409,29 +426,37 @@
             window.kategorileriEkranaCiz(); 
         };
 
-        window.ikinciSeviyeEkle = function(anaKat) {
-            let yeniAlt = prompt(anaKat + " şehrine eklenecek yeni kategorinin ismini yazın:\n(Örn: Tarihi Yerler, Mekanlar)");
-            if (yeniAlt && yeniAlt.trim() !== "") {
-                yeniAlt = yeniAlt.trim();
+        window.ikinciSeviyeEkle = function(anaKat, inputId) {
+            const input = document.getElementById(inputId);
+            let yeniAlt = input.value.trim();
+            
+            if (yeniAlt !== "") {
                 if(kategoriler[anaKat][yeniAlt] !== undefined) {
                     alert("Bu isimde bir kategori bu şehirde zaten var!");
                     return;
                 }
                 kategoriler[anaKat][yeniAlt] = []; 
+                input.value = "";
                 window.kategorileriEkranaCiz(); 
+            } else {
+                alert("Lütfen kategori ismini boş bırakmayın.");
             }
         };
 
-        window.ucuncuSeviyeEkle = function(anaKat, altKatAdi) {
-            let yeniEnAlt = prompt(altKatAdi + " içine ne eklemek istersiniz?\n(Örn: Et Yemekleri, Müzeler)");
-            if (yeniEnAlt && yeniEnAlt.trim() !== "") {
-                yeniEnAlt = yeniEnAlt.trim();
+        window.ucuncuSeviyeEkle = function(anaKat, altKatAdi, inputId) {
+            const input = document.getElementById(inputId);
+            let yeniEnAlt = input.value.trim();
+            
+            if (yeniEnAlt !== "") {
                 if(kategoriler[anaKat][altKatAdi].includes(yeniEnAlt)) {
                     alert("Bu menü zaten ekli!");
                     return;
                 }
                 kategoriler[anaKat][altKatAdi].push(yeniEnAlt);
+                input.value = "";
                 window.kategorileriEkranaCiz();
+            } else {
+                alert("Lütfen alt menü ismini boş bırakmayın.");
             }
         };
 
@@ -461,7 +486,7 @@
         window.kategorileriFirebaseKaydet = async function() {
             document.getElementById('loader').style.display = 'flex';
             try {
-                const docRef = doc(db, "ayarlar", "menuler_v3");
+                const docRef = doc(db, "ayarlar", "menuler_v4");
                 await setDoc(docRef, kategoriler); 
                 alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
             } catch (error) {
