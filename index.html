@@ -276,28 +276,45 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // --- KATEGORİLER ---
-        let kategoriler = {
-            "Edirne": ["Edirne Hakkında", "Coğrafi İşaretli Ürünler", "Edirne Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Tekirdağ": ["Tekirdağ Hakkında", "Coğrafi İşaretli Ürünler", "Tekirdağ Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Kırklareli": ["Kırklareli Hakkında", "Coğrafi İşaretli Ürünler", "Kırklareli Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Çanakkale": ["Çanakkale Hakkında", "Coğrafi İşaretli Ürünler", "Çanakkale Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Sakin_Sehirler": ["Sakin Şehirler Hakkında", "Sakin Şehirler Lezzet Durakları", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Turk_Mutfagi": ["Türk Mutfağı Hakkında", "Coğrafi İşaretli Ürünler", "Lezzet Durakları", "Türk Mutfağından Seçmeler", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"],
-            "Dunya_Mutfagi": ["Dünya Mutfağından Seçmeler", "Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
-        };
+  // --- ⚡ 3 SEVİYELİ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
 
-        window.altKategoriDoldur = function() {
-            const ana = document.getElementById("anaKategori").value.split(') ')[1] || document.getElementById("anaKategori").value;
-            const alt = document.getElementById("altKategori");
-            alt.innerHTML = '<option value="">Seçiniz...</option>';
-            if(kategoriler[ana]) {
-                kategoriler[ana].forEach(i => {
-                    let o = document.createElement("option"); o.value = i; o.innerText = i; alt.appendChild(o);
-                });
+        // Yeni Ağaç Yapısı: Ana Kategori -> Alt Kategori -> [Alt-Alt Kategoriler]
+        let kategoriler = {
+            "Edirne": {
+                "Edirne Hakkında": [],
+                "Coğrafi İşaretli Ürünler": [],
+                "Edirne Lezzet Durakları": [],
+                "Edirne Mutfağı": ["Et Yemekleri", "Sebze Yemekleri", "Hamur İşleri", "Pilavlar", "Salatalar ve Mezeler", "Tatlılar", "İçecekler"]
             }
         };
-// --- ⚡ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
+
+        // Formdaki "Şehir Seçimi" değiştiğinde alt kategorileri (2. ve 3. seviye) yükler
+        window.altKategoriDoldur = function() {
+            const ana = document.getElementById("anaKategori").value;
+            const alt = document.getElementById("altKategori");
+            alt.innerHTML = '<option value="">Seçiniz...</option>';
+            
+            if(ana && kategoriler[ana]) {
+                for (const [altKatAdi, altAltDizisi] of Object.entries(kategoriler[ana])) {
+                    if(altAltDizisi.length === 0) {
+                        // Eğer alt kategorinin kendi alt menüsü yoksa direkt ekle (Örn: Edirne Hakkında)
+                        let o = document.createElement("option"); o.value = altKatAdi; o.innerText = altKatAdi; alt.appendChild(o);
+                    } else {
+                        // Eğer alt menüsü varsa (Örn: Edirne Mutfağı), başlığı seçilemez yap, altındakileri seçtir
+                        let grup = document.createElement("optgroup");
+                        grup.label = "--- " + altKatAdi + " ---";
+                        alt.appendChild(grup);
+
+                        altAltDizisi.forEach(secenek => {
+                            let o = document.createElement("option"); 
+                            o.value = secenek; // Veritabanına "Et Yemekleri" diye kaydeder
+                            o.innerText = secenek; 
+                            alt.appendChild(o);
+                        });
+                    }
+                }
+            }
+        };
 
         // Sayfa açıldığında menüleri Firebase'den çek
         window.menuleriFirebaseDenCek = async function() {
@@ -306,108 +323,124 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
-                    kategoriler = docSnap.data(); // Veritabanındaki menüyü panele yükle
+                    kategoriler = docSnap.data();
                 } else {
-                    // Sistem ilk kez açılıyorsa, bizim o uzun listeyi veritabanına kaydet
-                    await setDoc(docRef, kategoriler);
+                    await setDoc(docRef, kategoriler); // İlk kez açılıyorsa varsayılanı kaydet
                 }
                 
-                // Formdaki "Şehir Seçimi" açılır kutusunu yeni menüye göre güncelle
                 const anaKategoriSelect = document.getElementById("anaKategori");
                 anaKategoriSelect.innerHTML = '<option value="">Seçiniz...</option>';
                 Object.keys(kategoriler).forEach(k => {
-                    let o = document.createElement("option"); 
-                    o.value = k; o.innerText = k.replace(/_/g, ' '); 
-                    anaKategoriSelect.appendChild(o);
+                    let o = document.createElement("option"); o.value = k; o.innerText = k.replace(/_/g, ' '); anaKategoriSelect.appendChild(o);
                 });
-                
-            } catch (error) {
-                console.error("Menü çekme hatası:", error);
-            }
+            } catch (error) { console.error("Menü çekme hatası:", error); }
         };
 
+        // PANELDEKİ KATEGORİ YÖNETİMİ EKRANINI ÇİZEN KOD
         window.kategorileriEkranaCiz = function() {
             const listeAlani = document.getElementById("dinamik-kategori-listesi");
             listeAlani.innerHTML = "";
 
-            for (const [anaKat, altKatDizisi] of Object.entries(kategoriler)) {
+            for (const [anaKat, altKatObjesi] of Object.entries(kategoriler)) {
                 let altKatHtml = "";
                 
-                // Alt Kategorileri Çiz
-                altKatDizisi.forEach((alt, index) => {
+                for (const [altKatAdi, altAltDizisi] of Object.entries(altKatObjesi)) {
+                    let ucuncuSeviyeHtml = "";
+                    
+                    // 3. SEVİYE (Örn: Et Yemekleri)
+                    altAltDizisi.forEach((enAlt, index) => {
+                        ucuncuSeviyeHtml += `
+                            <div style="display:flex; justify-content:space-between; padding:8px 10px; border-bottom:1px dashed #ddd; background:#fff; margin-bottom:3px; margin-left:30px; border-left:3px solid var(--secondary);">
+                                <span style="font-size:13px; color:#555;">↳ ${enAlt}</span>
+                                <button type="button" class="btn-sm" style="background:#e74c3c; padding:4px 8px; font-size:10px;" onclick="window.ucuncuSeviyeSil('${anaKat}', '${altKatAdi}', ${index})">Sil</button>
+                            </div>
+                        `;
+                    });
+
+                    // 2. SEVİYE (Örn: Edirne Mutfağı)
                     altKatHtml += `
-                        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center; background:#f9f9f9; margin-bottom:5px; border-radius:5px;">
-                            <span style="font-size:14px; font-weight:500; color:#2c3e50;">📄 ${alt}</span>
-                            <button type="button" class="btn-sm" style="background:#e74c3c; padding:6px 12px;" onclick="window.kategoriSil('${anaKat}', ${index})">Sil</button>
+                        <div style="background:#f9f9f9; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #eee;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                                <span style="font-size:15px; font-weight:600; color:#2c3e50;">📂 ${altKatAdi}</span>
+                                <div>
+                                    <button type="button" class="btn-sm" style="background:#2ecc71; padding:6px 10px;" onclick="window.ucuncuSeviyeEkle('${anaKat}', '${altKatAdi}')">+ Alt Menü Ekle</button>
+                                    <button type="button" class="btn-sm" style="background:#c0392b; padding:6px 10px;" onclick="window.ikinciSeviyeSil('${anaKat}', '${altKatAdi}')">Sil</button>
+                                </div>
+                            </div>
+                            ${ucuncuSeviyeHtml}
                         </div>
                     `;
-                });
+                }
 
-                // Ana Kategori Kutusunu Çiz
+                // 1. SEVİYE (Ana Kutu - Örn: Edirne)
                 listeAlani.innerHTML += `
-                    <div style="background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                    <div style="background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 25px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
-                            <h4 style="color: var(--dark-bg); margin:0; font-size:18px;">📁 ${anaKat.replace(/_/g, ' ')}</h4>
-                            <button type="button" class="btn-sm" style="background:#c0392b; padding:8px 15px;" onclick="window.kategoriSil('${anaKat}', null)">🗑️ Tüm Kategoriyi Sil</button>
+                            <h4 style="color: var(--dark-bg); margin:0; font-size:18px;">🌍 ${anaKat.replace(/_/g, ' ')}</h4>
+                            <button type="button" class="btn-sm" style="background:#c0392b; padding:8px 15px;" onclick="window.kategoriSil('${anaKat}')">🗑️ Tüm Şehri Sil</button>
                         </div>
-                        <div style="padding-left: 15px; margin-bottom:15px;">
+                        <div style="margin-bottom:15px;">
                             ${altKatHtml}
                         </div>
-                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; width:100%; padding:10px; font-size:14px;" onclick="window.altKategoriEkle('${anaKat}')">➕ Bu Şehre/Bölgeye Yeni Menü Ekle</button>
+                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; width:100%; padding:10px; font-size:14px;" onclick="window.ikinciSeviyeEkle('${anaKat}')">➕ Bu Şehre Yeni Kategori Ekle (Örn: Gezilecek Yerler)</button>
                     </div>
                 `;
             }
         };
 
+        // EKLEME İŞLEMLERİ
         window.anaKategoriEkle = function() {
             const input = document.getElementById("yeni-ana-kat-ad");
             const gorunenAd = input.value.trim();
-
             if (!gorunenAd) return alert("Lütfen bir isim yazın!");
             if (kategoriler[gorunenAd]) return alert("Bu kategori zaten var!");
-
-            kategoriler[gorunenAd] = []; // Yeni ana kategoriyi boş diziyle oluştur
+            kategoriler[gorunenAd] = {}; // Yeni boş obje oluştur
             input.value = "";
-            window.kategorileriEkranaCiz(); // Ekranı tazele
+            window.kategorileriEkranaCiz(); 
         };
 
-        window.altKategoriEkle = function(anaKat) {
-            const yeniAlt = prompt(`${anaKat} için yeni alt menü ismini girin:`);
+        window.ikinciSeviyeEkle = function(anaKat) {
+            const yeniAlt = prompt(`${anaKat} için yeni kategori ismini girin:\n(Örn: Edirne Mutfağı veya Tarihi Yerler)`);
             if (yeniAlt && yeniAlt.trim() !== "") {
-                if(kategoriler[anaKat].includes(yeniAlt.trim())) {
-                    alert("Bu isimde bir alt menü zaten mevcut!");
-                    return;
-                }
-                kategoriler[anaKat].push(yeniAlt.trim());
-                window.kategorileriEkranaCiz(); // Ekranı tazele
+                if(kategoriler[anaKat][yeniAlt.trim()]) return alert("Bu isimde bir kategori zaten mevcut!");
+                kategoriler[anaKat][yeniAlt.trim()] = []; // Boş dizi ile oluştur
+                window.kategorileriEkranaCiz();
             }
         };
 
-        window.kategoriSil = function(anaKat, altKatIndex) {
-            if (altKatIndex === null) {
-                if (confirm(`'${anaKat}' kategorisini ve içindeki tüm menüleri KÖKTEN silmek istediğinize emin misiniz?`)) {
-                    delete kategoriler[anaKat];
-                    window.kategorileriEkranaCiz();
-                }
-            } else {
-                if (confirm("Bu menüyü kaldırmak istiyor musunuz?")) {
-                    kategoriler[anaKat].splice(altKatIndex, 1);
-                    window.kategorileriEkranaCiz();
-                }
+        window.ucuncuSeviyeEkle = function(anaKat, altKatAdi) {
+            const yeniEnAlt = prompt(`${altKatAdi} menüsünün içine ne eklemek istersiniz?\n(Örn: Et Yemekleri, Çorbalar)`);
+            if (yeniEnAlt && yeniEnAlt.trim() !== "") {
+                if(kategoriler[anaKat][altKatAdi].includes(yeniEnAlt.trim())) return alert("Zaten var!");
+                kategoriler[anaKat][altKatAdi].push(yeniEnAlt.trim());
+                window.kategorileriEkranaCiz();
             }
         };
 
+        // SİLME İŞLEMLERİ
+        window.kategoriSil = function(anaKat) {
+            if (confirm(`'${anaKat}' şehrini ve İÇİNDEKİ HER ŞEYİ silmek istediğinize emin misiniz?`)) {
+                delete kategoriler[anaKat]; window.kategorileriEkranaCiz();
+            }
+        };
+        window.ikinciSeviyeSil = function(anaKat, altKatAdi) {
+            if (confirm(`'${altKatAdi}' kategorisini silmek istiyor musunuz?`)) {
+                delete kategoriler[anaKat][altKatAdi]; window.kategorileriEkranaCiz();
+            }
+        };
+        window.ucuncuSeviyeSil = function(anaKat, altKatAdi, index) {
+            kategoriler[anaKat][altKatAdi].splice(index, 1); window.kategorileriEkranaCiz();
+        };
+
+        // FİREBASE'E KAYDETME
         window.kategorileriFirebaseKaydet = async function() {
             document.getElementById('loader').style.display = 'flex';
             try {
                 const docRef = doc(db, "ayarlar", "menuler");
-                await setDoc(docRef, kategoriler); // YENİ MENÜYÜ FİREBASE'E GÖM!
-                
+                await setDoc(docRef, kategoriler); 
                 alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
-                
             } catch (error) {
-                console.error("Kaydetme hatası:", error);
-                alert("Kaydetme hatası oluştu, internetini kontrol et!");
+                console.error("Kaydetme hatası:", error); alert("Kaydetme hatası oluştu, internetini kontrol et!");
             }
             document.getElementById('loader').style.display = 'none';
         };
