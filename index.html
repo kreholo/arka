@@ -134,13 +134,16 @@
     </div>
 
     <div id="admin-panel">
-        <aside class="sidebar">
+<aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Trakya Panel</h2>
             </div>
             <nav class="nav-menu">
                 <a class="nav-link active" id="tab-ekle-btn" onclick="window.sekmeyiDegistir('ekle')">Yeni İçerik Ekle</a>
                 <a class="nav-link" id="tab-liste-btn" onclick="window.sekmeyiDegistir('liste')">İçerikleri Düzenle / Sil</a>
+                
+                <a class="nav-link" id="tab-kategori-btn" onclick="window.sekmeyiDegistir('kategori')">⚙️ Menü / Kategori Yönetimi</a>
+                
                 <a class="nav-link" onclick="location.reload()">Güvenli Çıkış</a>
             </nav>
         </aside>
@@ -221,7 +224,26 @@
                     </table>
                 </div>
             </section>
+<section class="form-container" id="bolum-kategori" style="display: none;">
+                <h3 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">Menü ve Kategori Yöneticisi</h3>
+                <p style="font-size: 14px; color: #555; margin-bottom: 20px;">Ana sitedeki üst menüyü ve içerik eklerken çıkan kategorileri buradan yönetebilirsiniz. Eklediğiniz her şey anında ana siteye yansır.</p>
 
+                <div style="background: #f0f7fa; padding: 20px; border-radius: 8px; border: 1px solid var(--secondary); margin-bottom: 30px;">
+                    <h4 style="color: var(--secondary); margin-bottom: 10px;">➕ Yeni Ana Kategori (Şehir/Bölge) Ekle</h4>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="yeni-ana-kat-ad" placeholder="Örn: Çorlu veya Ege Mutfağı..." style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
+                        <button type="button" class="btn-submit" style="width: auto; padding: 0 20px; margin: 0; font-size: 14px;" onclick="window.anaKategoriEkle()">Ekle</button>
+                    </div>
+                </div>
+
+                <div id="dinamik-kategori-listesi">
+                    <p>Kategoriler Yükleniyor...</p>
+                </div>
+                
+                <button type="button" class="btn-submit" style="margin-top: 20px;" onclick="window.kategorileriFirebaseKaydet()">
+                    💾 Menü Değişikliklerini Kaydet ve Yayınla
+                </button>
+            </section>
         </main>
     </div>
     <script type="module">
@@ -275,13 +297,19 @@
             }
         };
 
-        // --- SEKMELER ARASI GEÇİŞ ---
+// --- SEKMELER ARASI GEÇİŞ ---
         window.sekmeyiDegistir = function(sekme) {
+            // 1. Önce bütün butonların mavi "aktif" rengini kaldırıyoruz
             document.getElementById('tab-ekle-btn').classList.remove('active');
             document.getElementById('tab-liste-btn').classList.remove('active');
+            document.getElementById('tab-kategori-btn').classList.remove('active'); // Yeni Buton
+
+            // 2. Bütün ekranları gizliyoruz
             document.getElementById('bolum-ekle').style.display = 'none';
             document.getElementById('bolum-liste').style.display = 'none';
+            document.getElementById('bolum-kategori').style.display = 'none'; // Yeni Ekran
 
+            // 3. Tıklanan sekme hangisiyse onu açıyoruz
             if(sekme === 'ekle') {
                 document.getElementById('tab-ekle-btn').classList.add('active');
                 document.getElementById('bolum-ekle').style.display = 'block';
@@ -290,15 +318,27 @@
                 document.getElementById("icerikFormu").reset();
                 document.getElementById("editID").value = "";
                 document.getElementById("btn-kaydet").innerHTML = "💾 İçeriği Firebase'e Kaydet";
-                document.getElementById("modul-alani").innerHTML = ""; // Ekranı temizle
-            } else {
+                document.getElementById("modul-alani").innerHTML = ""; 
+            } 
+            else if (sekme === 'liste') {
                 document.getElementById('tab-liste-btn').classList.add('active');
                 document.getElementById('bolum-liste').style.display = 'block';
                 document.getElementById('sayfa-basligi').innerText = "İçerikleri Düzenle / Sil";
                 window.icerikleriListele();
             }
+            else if (sekme === 'kategori') {
+                // YENİ MENÜ YÖNETİMİ EKRANI
+                document.getElementById('tab-kategori-btn').classList.add('active');
+                document.getElementById('bolum-kategori').style.display = 'block';
+                document.getElementById('sayfa-basligi').innerText = "Menü ve Kategori Yönetimi";
+                
+                // Birazdan yazacağımız Firebase'den menüleri çeken fonksiyon
+                if (typeof window.kategorileriEkranaCiz === "function") {
+                    window.kategorileriEkranaCiz(); 
+                }
+            }
         };
-
+ 
         // --- ⚡ SİHİRLİ KISIM: DİNAMİK MODÜL EKLEME ⚡ ---
         window.modulEkle = function(tip, veri = {}) {
             const alan = document.getElementById("modul-alani");
