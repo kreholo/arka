@@ -414,60 +414,80 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // EKLEME İŞLEMLERİ
+// EKLEME İŞLEMLERİ
         window.anaKategoriEkle = function() {
             const input = document.getElementById("yeni-ana-kat-ad");
             const gorunenAd = input.value.trim();
             if (!gorunenAd) return alert("Lütfen bir isim yazın!");
             if (kategoriler[gorunenAd]) return alert("Bu kategori zaten var!");
-            kategoriler[gorunenAd] = {}; 
+            kategoriler[gorunenAd] = {}; // Yeni boş obje oluştur
             input.value = "";
             window.kategorileriEkranaCiz(); 
         };
 
         window.ikinciSeviyeEkle = function(anaKat) {
-            const yeniAlt = prompt(`${anaKat} için yeni kategori ismini girin:\n(Örn: Edirne Mutfağı veya Tarihi Yerler)`);
+            // Ekrana yazı yazma kutusu çıkartır
+            let yeniAlt = prompt(anaKat + " şehrine eklenecek yeni kategorinin ismini yazın:\n(Örn: Tarihi Yerler, Mekanlar, Merkez vs.)");
+            
             if (yeniAlt && yeniAlt.trim() !== "") {
-                if(kategoriler[anaKat][yeniAlt.trim()]) return alert("Bu isimde bir kategori zaten mevcut!");
-                kategoriler[anaKat][yeniAlt.trim()] = []; 
-                window.kategorileriEkranaCiz();
+                yeniAlt = yeniAlt.trim();
+                // Eğer bu isimde bir kategori zaten yoksa ekle
+                if(kategoriler[anaKat][yeniAlt] !== undefined) {
+                    alert("Bu isimde bir kategori bu şehirde zaten var!");
+                    return;
+                }
+                kategoriler[anaKat][yeniAlt] = []; // Alt menüler için boş liste aç
+                window.kategorileriEkranaCiz(); // Ekranı güncelle
             }
         };
 
         window.ucuncuSeviyeEkle = function(anaKat, altKatAdi) {
-            const yeniEnAlt = prompt(`${altKatAdi} menüsünün içine ne eklemek istersiniz?\n(Örn: Et Yemekleri, Çorbalar)`);
+            let yeniEnAlt = prompt(altKatAdi + " içine ne eklemek istersiniz?\n(Örn: Et Yemekleri, Müzeler)");
+            
             if (yeniEnAlt && yeniEnAlt.trim() !== "") {
-                if(kategoriler[anaKat][altKatAdi].includes(yeniEnAlt.trim())) return alert("Zaten var!");
-                kategoriler[anaKat][altKatAdi].push(yeniEnAlt.trim());
+                yeniEnAlt = yeniEnAlt.trim();
+                if(kategoriler[anaKat][altKatAdi].includes(yeniEnAlt)) {
+                    alert("Bu menü zaten ekli!");
+                    return;
+                }
+                kategoriler[anaKat][altKatAdi].push(yeniEnAlt);
                 window.kategorileriEkranaCiz();
             }
         };
 
         // SİLME İŞLEMLERİ
         window.kategoriSil = function(anaKat) {
-            if (confirm(`'${anaKat}' şehrini ve İÇİNDEKİ HER ŞEYİ silmek istediğinize emin misiniz?`)) {
-                delete kategoriler[anaKat]; window.kategorileriEkranaCiz();
+            if (confirm("DİKKAT: '" + anaKat + "' şehrini ve İÇİNDEKİ HER ŞEYİ silmek istediğinize emin misiniz?")) {
+                delete kategoriler[anaKat]; 
+                window.kategorileriEkranaCiz();
             }
         };
+        
         window.ikinciSeviyeSil = function(anaKat, altKatAdi) {
-            if (confirm(`'${altKatAdi}' kategorisini silmek istiyor musunuz?`)) {
-                delete kategoriler[anaKat][altKatAdi]; window.kategorileriEkranaCiz();
+            if (confirm("'" + altKatAdi + "' kategorisini silmek istiyor musunuz?")) {
+                delete kategoriler[anaKat][altKatAdi]; 
+                window.kategorileriEkranaCiz();
             }
         };
+        
         window.ucuncuSeviyeSil = function(anaKat, altKatAdi, index) {
-            kategoriler[anaKat][altKatAdi].splice(index, 1); window.kategorileriEkranaCiz();
+            if (confirm("Bu alt menüyü kaldırmak istediğinize emin misiniz?")) {
+                kategoriler[anaKat][altKatAdi].splice(index, 1); 
+                window.kategorileriEkranaCiz();
+            }
         };
 
         // FİREBASE'E KAYDETME
         window.kategorileriFirebaseKaydet = async function() {
             document.getElementById('loader').style.display = 'flex';
             try {
-                // Kaydederken de menuler_v3 dosyasına kaydediyoruz!
+                // Kaydederken menuler_v3 dosyasına kaydediyoruz!
                 const docRef = doc(db, "ayarlar", "menuler_v3");
                 await setDoc(docRef, kategoriler); 
                 alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
             } catch (error) {
-                console.error("Kaydetme hatası:", error); alert("Kaydetme hatası oluştu, internetini kontrol et!");
+                console.error("Kaydetme hatası:", error); 
+                alert("Kaydetme hatası oluştu, internetini kontrol et!");
             }
             document.getElementById('loader').style.display = 'none';
         };
