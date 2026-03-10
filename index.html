@@ -134,16 +134,14 @@
     </div>
 
     <div id="admin-panel">
-<aside class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Trakya Panel</h2>
             </div>
             <nav class="nav-menu">
                 <a class="nav-link active" id="tab-ekle-btn" onclick="window.sekmeyiDegistir('ekle')">Yeni İçerik Ekle</a>
                 <a class="nav-link" id="tab-liste-btn" onclick="window.sekmeyiDegistir('liste')">İçerikleri Düzenle / Sil</a>
-                
                 <a class="nav-link" id="tab-kategori-btn" onclick="window.sekmeyiDegistir('kategori')">⚙️ Menü / Kategori Yönetimi</a>
-                
                 <a class="nav-link" onclick="location.reload()">Güvenli Çıkış</a>
             </nav>
         </aside>
@@ -164,14 +162,7 @@
                                 <label>Şehir / Bölge Seçimi</label>
                                 <select id="anaKategori" onchange="window.altKategoriDoldur()" required>
                                     <option value="">Seçiniz...</option>
-                                    <option value="Edirne">A) Edirne</option>
-                                    <option value="Tekirdağ">B) Tekirdağ</option>
-                                    <option value="Kırklareli">C) Kırklareli</option>
-                                    <option value="Çanakkale">D) Çanakkale</option>
-                                    <option value="Sakin_Sehirler">E) Sakin Şehirler</option>
-                                    <option value="Turk_Mutfagi">F) Türk Mutfağı</option>
-                                    <option value="Dunya_Mutfagi">G) Dünya Mutfağı</option>
-                                </select>
+                                    </select>
                             </div>
                             <div class="form-group">
                                 <label>Alt Kategori (Bölüm)</label>
@@ -187,8 +178,7 @@
                         </div>
                     </div>
 
-                    <div id="modul-alani">
-                        </div>
+                    <div id="modul-alani"></div>
 
                     <div class="modul-ekle-menu">
                         <p>Sayfanızı adım adım tasarlayın. Sıradaki bloğu seçin:</p>
@@ -219,12 +209,12 @@
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody id="icerik-tablosu">
-                            </tbody>
+                        <tbody id="icerik-tablosu"></tbody>
                     </table>
                 </div>
             </section>
-<section class="form-container" id="bolum-kategori" style="display: none;">
+
+            <section class="form-container" id="bolum-kategori" style="display: none;">
                 <h3 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">Menü ve Kategori Yöneticisi</h3>
                 <p style="font-size: 14px; color: #555; margin-bottom: 20px;">Ana sitedeki üst menüyü ve içerik eklerken çıkan kategorileri buradan yönetebilirsiniz. Eklediğiniz her şey anında ana siteye yansır.</p>
 
@@ -244,11 +234,13 @@
                     💾 Menü Değişikliklerini Kaydet ve Yayınla
                 </button>
             </section>
+
         </main>
     </div>
+
     <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
- import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDKWEvPGCcjecP-r4MceBudchDRX2QdaJA",
@@ -262,22 +254,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-       // --- GİRİŞ KONTROLÜ ---
+        // --- GİRİŞ KONTROLÜ ---
         window.panelGiris = function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
             if(u === "admintrakya" && p === "tradmin5739") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'flex';
-                window.menuleriFirebaseDenCek(); // BİZİM YENİ YAZACAĞIMIZ FONKSİYONU ÇAĞIRIYOR
+                window.menuleriFirebaseDenCek(); 
                 window.icerikleriListele();
             } else {
                 alert("Kullanıcı adı veya şifre hatalı!");
             }
         };
-// --- ⚡ 3 SEVİYELİ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
 
-        // Yepyeni, eksiksiz Ağaç Yapısı
+        // --- ⚡ 3 SEVİYELİ DİNAMİK MENÜ / KATEGORİ YÖNETİMİ ⚡ ---
         let kategoriler = {
             "Edirne": {
                 "Edirne Hakkında": [],
@@ -318,7 +309,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // Formdaki "Şehir Seçimi" değiştiğinde alt kategorileri (2. ve 3. seviye) yükler
         window.altKategoriDoldur = function() {
             const ana = document.getElementById("anaKategori").value;
             const alt = document.getElementById("altKategori");
@@ -341,17 +331,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // Sayfa açıldığında menüleri Firebase'den çek
         window.menuleriFirebaseDenCek = async function() {
             try {
-                // DİKKAT: Eski hatalı veriyi okumasın diye adını "menuler_v3" yaptık!
                 const docRef = doc(db, "ayarlar", "menuler_v3");
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
                     kategoriler = docSnap.data();
                 } else {
-                    await setDoc(docRef, kategoriler); // İlk kez açılıyorsa varsayılanı kaydet
+                    await setDoc(docRef, kategoriler); 
                 }
                 
                 const anaKategoriSelect = document.getElementById("anaKategori");
@@ -362,7 +350,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             } catch (error) { console.error("Menü çekme hatası:", error); }
         };
 
-        // PANELDEKİ KATEGORİ YÖNETİMİ EKRANINI ÇİZEN KOD
         window.kategorileriEkranaCiz = function() {
             const listeAlani = document.getElementById("dinamik-kategori-listesi");
             listeAlani.innerHTML = "";
@@ -373,7 +360,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 for (const [altKatAdi, altAltDizisi] of Object.entries(altKatObjesi)) {
                     let ucuncuSeviyeHtml = "";
                     
-                    // 3. SEVİYE 
                     altAltDizisi.forEach((enAlt, index) => {
                         ucuncuSeviyeHtml += `
                             <div style="display:flex; justify-content:space-between; padding:8px 10px; border-bottom:1px dashed #ddd; background:#fff; margin-bottom:3px; margin-left:30px; border-left:3px solid var(--secondary);">
@@ -383,7 +369,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                         `;
                     });
 
-                    // 2. SEVİYE 
                     altKatHtml += `
                         <div style="background:#f9f9f9; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #eee;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -398,7 +383,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                     `;
                 }
 
-                // 1. SEVİYE 
                 listeAlani.innerHTML += `
                     <div style="background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 25px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--primary); padding-bottom:10px;">
@@ -408,42 +392,38 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                         <div style="margin-bottom:15px;">
                             ${altKatHtml}
                         </div>
-                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; width:100%; padding:10px; font-size:14px;" onclick="window.ikinciSeviyeEkle('${anaKat}')">➕ Bu Şehre Yeni Kategori Ekle (Örn: Gezilecek Yerler)</button>
+                        <button type="button" class="btn-sm btn-edit" style="background:#3498db; width:100%; padding:10px; font-size:14px;" onclick="window.ikinciSeviyeEkle('${anaKat}')">➕ Bu Şehre Yeni Kategori Ekle</button>
                     </div>
                 `;
             }
         };
 
-// EKLEME İŞLEMLERİ
+        // EKLEME İŞLEMLERİ
         window.anaKategoriEkle = function() {
             const input = document.getElementById("yeni-ana-kat-ad");
             const gorunenAd = input.value.trim();
             if (!gorunenAd) return alert("Lütfen bir isim yazın!");
             if (kategoriler[gorunenAd]) return alert("Bu kategori zaten var!");
-            kategoriler[gorunenAd] = {}; // Yeni boş obje oluştur
+            kategoriler[gorunenAd] = {}; 
             input.value = "";
             window.kategorileriEkranaCiz(); 
         };
 
         window.ikinciSeviyeEkle = function(anaKat) {
-            // Ekrana yazı yazma kutusu çıkartır
-            let yeniAlt = prompt(anaKat + " şehrine eklenecek yeni kategorinin ismini yazın:\n(Örn: Tarihi Yerler, Mekanlar, Merkez vs.)");
-            
+            let yeniAlt = prompt(anaKat + " şehrine eklenecek yeni kategorinin ismini yazın:\n(Örn: Tarihi Yerler, Mekanlar)");
             if (yeniAlt && yeniAlt.trim() !== "") {
                 yeniAlt = yeniAlt.trim();
-                // Eğer bu isimde bir kategori zaten yoksa ekle
                 if(kategoriler[anaKat][yeniAlt] !== undefined) {
                     alert("Bu isimde bir kategori bu şehirde zaten var!");
                     return;
                 }
-                kategoriler[anaKat][yeniAlt] = []; // Alt menüler için boş liste aç
-                window.kategorileriEkranaCiz(); // Ekranı güncelle
+                kategoriler[anaKat][yeniAlt] = []; 
+                window.kategorileriEkranaCiz(); 
             }
         };
 
         window.ucuncuSeviyeEkle = function(anaKat, altKatAdi) {
             let yeniEnAlt = prompt(altKatAdi + " içine ne eklemek istersiniz?\n(Örn: Et Yemekleri, Müzeler)");
-            
             if (yeniEnAlt && yeniEnAlt.trim() !== "") {
                 yeniEnAlt = yeniEnAlt.trim();
                 if(kategoriler[anaKat][altKatAdi].includes(yeniEnAlt)) {
@@ -481,7 +461,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
         window.kategorileriFirebaseKaydet = async function() {
             document.getElementById('loader').style.display = 'flex';
             try {
-                // Kaydederken menuler_v3 dosyasına kaydediyoruz!
                 const docRef = doc(db, "ayarlar", "menuler_v3");
                 await setDoc(docRef, kategoriler); 
                 alert("✅ Harika! Tüm menü ve kategoriler başarıyla kaydedildi.");
@@ -491,20 +470,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
             document.getElementById('loader').style.display = 'none';
         };
-        
-// --- SEKMELER ARASI GEÇİŞ ---
+
+        // --- SEKMELER ARASI GEÇİŞ ---
         window.sekmeyiDegistir = function(sekme) {
-            // 1. Önce bütün butonların mavi "aktif" rengini kaldırıyoruz
             document.getElementById('tab-ekle-btn').classList.remove('active');
             document.getElementById('tab-liste-btn').classList.remove('active');
-            document.getElementById('tab-kategori-btn').classList.remove('active'); // Yeni Buton
+            document.getElementById('tab-kategori-btn').classList.remove('active'); 
 
-            // 2. Bütün ekranları gizliyoruz
             document.getElementById('bolum-ekle').style.display = 'none';
             document.getElementById('bolum-liste').style.display = 'none';
-            document.getElementById('bolum-kategori').style.display = 'none'; // Yeni Ekran
+            document.getElementById('bolum-kategori').style.display = 'none'; 
 
-            // 3. Tıklanan sekme hangisiyse onu açıyoruz
             if(sekme === 'ekle') {
                 document.getElementById('tab-ekle-btn').classList.add('active');
                 document.getElementById('bolum-ekle').style.display = 'block';
@@ -514,6 +490,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 document.getElementById("editID").value = "";
                 document.getElementById("btn-kaydet").innerHTML = "💾 İçeriği Firebase'e Kaydet";
                 document.getElementById("modul-alani").innerHTML = ""; 
+                window.altKategoriDoldur(); 
             } 
             else if (sekme === 'liste') {
                 document.getElementById('tab-liste-btn').classList.add('active');
@@ -522,24 +499,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 window.icerikleriListele();
             }
             else if (sekme === 'kategori') {
-                // YENİ MENÜ YÖNETİMİ EKRANI
                 document.getElementById('tab-kategori-btn').classList.add('active');
                 document.getElementById('bolum-kategori').style.display = 'block';
                 document.getElementById('sayfa-basligi').innerText = "Menü ve Kategori Yönetimi";
-                
-                // Birazdan yazacağımız Firebase'den menüleri çeken fonksiyon
-                if (typeof window.kategorileriEkranaCiz === "function") {
-                    window.kategorileriEkranaCiz(); 
-                }
+                window.kategorileriEkranaCiz(); 
             }
         };
- 
-        // --- ⚡ SİHİRLİ KISIM: DİNAMİK MODÜL EKLEME ⚡ ---
+
+        // --- DİNAMİK MODÜL EKLEME ---
         window.modulEkle = function(tip, veri = {}) {
             const alan = document.getElementById("modul-alani");
             const div = document.createElement("div");
             div.className = `modul-kutu m-${tip}`;
-            div.dataset.tip = tip; // Kaydederken ne tür olduğunu anlamak için
+            div.dataset.tip = tip; 
             
             let ic_html = `<button type="button" class="modul-sil-btn" onclick="this.parentElement.remove()">✖ Sil</button>`;
 
@@ -577,10 +549,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             alan.appendChild(div);
         };
 
-        // --- KAYDET VEYA GÜNCELLE ---
+        // --- İÇERİK KAYDETME ---
         window.veritabaninaKaydet = async function() {
-            const hamAna = document.getElementById("anaKategori").value;
-            const ana = hamAna.split(') ')[1] || hamAna;
+            const ana = document.getElementById("anaKategori").value;
             const alt = document.getElementById("altKategori").value;
             const baslik = document.getElementById("baslik").value;
             const editID = document.getElementById("editID").value;
@@ -590,7 +561,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             document.getElementById('loader').style.display = 'flex';
             
             try {
-                // MODÜLLERİ SIRASIYLA TOPLA
                 let siraliModuller = [];
                 
                 document.querySelectorAll('.modul-kutu').forEach(kutu => {
@@ -610,16 +580,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                     }
                 });
 
-                // Veri Paketi Oluştur (YENİ SİSTEM)
                 const veriPaketi = {
                     kategori: ana,
                     alt_kategori: alt,
                     baslik: baslik,
-                    moduller: siraliModuller, // Artık her şey bu dizinin içinde sırasıyla duruyor!
+                    moduller: siraliModuller, 
                     tarih: new Date().toLocaleString('tr-TR')
                 };
 
-                // Kayıt
                 if(editID) {
                     await updateDoc(doc(db, "icerikler", editID), veriPaketi);
                     alert("✅ İçerik Başarıyla GÜNCELLENDİ!");
@@ -638,7 +606,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // --- LİSTELEME İŞLEMLERİ ---
+        // --- İÇERİK LİSTELEME ---
         let tumIcerikler = [];
         window.icerikleriListele = async function() {
             const tablo = document.getElementById('icerik-tablosu');
@@ -675,7 +643,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             } catch (e) { console.error(e); }
         };
 
-        // --- SİLME İŞLEMİ ---
+        // --- İÇERİK SİLME ---
         window.icerikSil = async function(id) {
             if(confirm("Bu içeriği kalıcı olarak silmek istediğinize emin misiniz?")) {
                 await deleteDoc(doc(db, "icerikler", id));
@@ -684,7 +652,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             }
         };
 
-        // --- DÜZENLEME (ESKİ SİSTEMDEN YENİ MODÜLER SİSTEME MİGRASYON) ---
+        // --- İÇERİK DÜZENLEME ---
         window.icerikDuzenle = function(id) {
             const veri = tumIcerikler.find(x => x.id === id);
             if(!veri) return;
@@ -693,43 +661,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             document.getElementById('sayfa-basligi').innerText = "İçeriği Düzenle";
             document.getElementById("editID").value = veri.id;
             
-            // Kategori Eşleştirme
-            const selectOptions = document.getElementById("anaKategori").options;
-            for(let i=0; i<selectOptions.length; i++) {
-                if(selectOptions[i].value.includes(veri.kategori)) {
-                    document.getElementById("anaKategori").value = selectOptions[i].value;
-                    break;
-                }
-            }
+            document.getElementById("anaKategori").value = veri.kategori;
             window.altKategoriDoldur(); 
             setTimeout(() => { document.getElementById("altKategori").value = veri.alt_kategori; }, 100);
 
             document.getElementById("baslik").value = veri.baslik;
-            
-            // Ekranı temizle
             document.getElementById("modul-alani").innerHTML = "";
 
-            // EĞER İÇERİK YENİ MODÜLER SİSTEMLE EKLENMİŞSE
             if(veri.moduller && veri.moduller.length > 0) {
-                veri.moduller.forEach(m => {
-                    window.modulEkle(m.tip, m);
-                });
+                veri.moduller.forEach(m => { window.modulEkle(m.tip, m); });
             } 
-            // EĞER İÇERİK ESKİ SİSTEMLE EKLENMİŞSE (Otomatik Modüllere Çevirir)
             else {
-                // Eski Ana Fotoğraf
                 if(veri.fotograflar && veri.fotograflar.length > 0) {
                     veri.fotograflar.forEach(f => window.modulEkle('foto', f));
                 } else if(veri.gorsel_url) {
                     window.modulEkle('foto', { url: veri.gorsel_url, duzen: 'tam' });
                 }
 
-                // Eski Ana Metin
-                if(veri.ana_metin) {
-                    window.modulEkle('metin', { icerik: veri.ana_metin });
-                }
+                if(veri.ana_metin) window.modulEkle('metin', { icerik: veri.ana_metin });
 
-                // Eski Alt Başlık ve İçerikler
                 if(veri.ekstra_icerikler) {
                     veri.ekstra_icerikler.forEach(e => {
                         if(e.altBaslik) window.modulEkle('baslik', { icerik: e.altBaslik });
@@ -737,7 +687,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                     });
                 }
 
-                // Eski Butonlar
                 if(veri.butonlar && veri.butonlar.length > 0) {
                     veri.butonlar.forEach(b => window.modulEkle('buton', b));
                 } else if (veri.link) {
