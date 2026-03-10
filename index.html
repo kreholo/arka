@@ -496,7 +496,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
             document.getElementById('loader').style.display = 'none';
         };
 
-        // --- SEKMELER ARASI GEÇİŞ ---
+// --- SEKMELER ARASI GEÇİŞ ---
         window.sekmeyiDegistir = function(sekme) {
             document.getElementById('tab-ekle-btn').classList.remove('active');
             document.getElementById('tab-liste-btn').classList.remove('active');
@@ -515,6 +515,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
                 document.getElementById("editID").value = "";
                 document.getElementById("btn-kaydet").innerHTML = "💾 İçeriği Firebase'e Kaydet";
                 document.getElementById("modul-alani").innerHTML = ""; 
+                
+                // ⚡ İŞTE ÇÖZÜM BURADA: Ekleme ekranı açıldığında Şehir kutusunu anında günceller!
+                const anaKategoriSelect = document.getElementById("anaKategori");
+                anaKategoriSelect.innerHTML = '<option value="">Seçiniz...</option>';
+                Object.keys(kategoriler).forEach(k => {
+                    let o = document.createElement("option"); 
+                    o.value = k; 
+                    o.innerText = k.replace(/_/g, ' '); 
+                    anaKategoriSelect.appendChild(o);
+                });
+
                 window.altKategoriDoldur(); 
             } 
             else if (sekme === 'liste') {
